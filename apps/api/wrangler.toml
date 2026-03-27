@@ -1,0 +1,9 @@
+name = "goal-tracker-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "goal-tracker-db"
+database_id = "local"
