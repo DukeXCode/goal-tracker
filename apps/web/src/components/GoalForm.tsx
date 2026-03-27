@@ -1,6 +1,30 @@
 import { useState } from "react";
 import type { Goal, GoalStatus, CreateGoalInput } from "@goal-tracker/shared";
 
+function toDateString(date: Date) {
+  return date.toISOString().split("T")[0];
+}
+
+const quickDates = [
+  { label: "Today", value: () => toDateString(new Date()) },
+  {
+    label: "Next Week",
+    value: () => {
+      const d = new Date();
+      d.setDate(d.getDate() + 7);
+      return toDateString(d);
+    },
+  },
+  {
+    label: "Next Month",
+    value: () => {
+      const d = new Date();
+      d.setMonth(d.getMonth() + 1);
+      return toDateString(d);
+    },
+  },
+];
+
 export default function GoalForm({
   initialData,
   onSubmit,
@@ -59,31 +83,47 @@ export default function GoalForm({
           placeholder="Describe your goal..."
         />
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Status
-          </label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as GoalStatus)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="not_started">Not Started</option>
-            <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Target Date
-          </label>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Status
+        </label>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value as GoalStatus)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="not_started">Not Started</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Target Date
+        </label>
+        <div className="flex items-center gap-2 flex-wrap">
           <input
             type="date"
             value={targetDate}
             onChange={(e) => setTargetDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
+          <div className="flex gap-1.5">
+            {quickDates.map((qd) => (
+              <button
+                key={qd.label}
+                type="button"
+                onClick={() => setTargetDate(qd.value())}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                  targetDate === qd.value()
+                    ? "bg-blue-100 text-blue-700"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                {qd.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
       <div className="flex gap-3 pt-2">
