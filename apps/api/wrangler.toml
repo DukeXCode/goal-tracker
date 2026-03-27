@@ -6,4 +6,4 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "goal-tracker-db"
-database_id = "local"
+database_id = "f4f8611f-35ec-4cde-b2db-9254232b3358"

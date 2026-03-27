@@ -7,7 +7,8 @@ import type {
   UpdateJournalEntryInput,
 } from "@goal-tracker/shared";
 
-const BASE = "/api";
+const API_URL = import.meta.env.VITE_API_URL || "";
+const BASE = `${API_URL}/api`;
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
