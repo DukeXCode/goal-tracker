@@ -6,6 +6,7 @@ import type {
   Goal,
 } from "@goal-tracker/shared";
 import { api } from "../lib/api";
+import Markdown from "./Markdown";
 
 const moods: { value: Mood; emoji: string }[] = [
   { value: "great", emoji: "😄" },
@@ -31,6 +32,7 @@ export default function JournalEntryForm({
   const [mood, setMood] = useState<Mood | null>(initialData?.mood ?? null);
   const [goalId, setGoalId] = useState(initialData?.goal_id ?? defaultGoalId ?? "");
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [preview, setPreview] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -69,16 +71,52 @@ export default function JournalEntryForm({
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Content
-        </label>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={6}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Write your thoughts..."
-        />
+        <div className="flex items-center justify-between mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Content
+          </label>
+          <div className="flex gap-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setPreview(false)}
+              className={`px-2 py-1 rounded transition-colors ${
+                !preview
+                  ? "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200"
+                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              }`}
+            >
+              Write
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreview(true)}
+              className={`px-2 py-1 rounded transition-colors ${
+                preview
+                  ? "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200"
+                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              }`}
+            >
+              Preview
+            </button>
+          </div>
+        </div>
+        {preview ? (
+          <div className="w-full min-h-[10rem] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 overflow-auto">
+            {content ? (
+              <Markdown content={content} />
+            ) : (
+              <p className="text-gray-400 dark:text-gray-500 italic">Nothing to preview</p>
+            )}
+          </div>
+        ) : (
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={8}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Write in markdown... **bold**, *italic*, # headings, - lists, etc."
+          />
+        )}
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>

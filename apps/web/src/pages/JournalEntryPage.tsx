@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import type { JournalEntry, Goal } from "@goal-tracker/shared";
 import { api } from "../lib/api";
 import JournalEntryForm from "../components/JournalEntryForm";
+import Markdown from "../components/Markdown";
 
 const moodEmoji: Record<string, string> = {
   great: "😄",
@@ -103,8 +104,10 @@ export default function JournalEntryPage() {
             </div>
           )}
 
-          <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-            {entry.content || (
+          <div className="text-gray-700 dark:text-gray-300">
+            {entry.content ? (
+              <Markdown content={entry.content} />
+            ) : (
               <span className="text-gray-400 dark:text-gray-500 italic">No content</span>
             )}
           </div>

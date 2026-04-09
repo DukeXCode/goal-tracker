@@ -8,10 +8,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@goal-tracker/shared": "workspace:*",
+    "@tailwindcss/typography": "^0.5.19",
+    "marked": "^18.0.0",
     "react": "^19",
     "react-dom": "^19",
-    "react-router-dom": "^7",
-    "@goal-tracker/shared": "workspace:*"
+    "react-router-dom": "^7"
   },
   "devDependencies": {
     "@types/react": "^19",
