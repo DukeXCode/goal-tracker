@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import type { Goal, GoalStatus } from "@goal-tracker/shared";
 
 const statusColors: Record<string, string> = {
-  not_started: "bg-gray-100 text-gray-700",
-  in_progress: "bg-blue-100 text-blue-700",
-  completed: "bg-green-100 text-green-700",
+  not_started: "bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300",
+  in_progress: "bg-blue-100 text-blue-700 dark:bg-blue-800/60 dark:text-blue-300",
+  completed: "bg-green-100 text-green-700 dark:bg-green-800/60 dark:text-green-300",
 };
 
 const statusLabels: Record<string, string> = {
@@ -41,11 +41,11 @@ export default function GoalCard({
   }, [dropdownOpen]);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
         <Link
           to={`/goals/${goal.id}`}
-          className="text-base font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+          className="text-base font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
         >
           {goal.title}
         </Link>
@@ -57,7 +57,7 @@ export default function GoalCard({
             {statusLabels[goal.status]}
           </button>
           {dropdownOpen && (
-            <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1 min-w-[140px]">
+            <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10 py-1 min-w-[140px]">
               {allStatuses.map((s) => (
                 <button
                   key={s}
@@ -69,8 +69,8 @@ export default function GoalCard({
                   }}
                   className={`w-full text-left px-3 py-1.5 text-xs font-medium transition-colors ${
                     s === goal.status
-                      ? "bg-gray-50 text-gray-400"
-                      : "text-gray-700 hover:bg-gray-100"
+                      ? "bg-gray-50 text-gray-400 dark:bg-gray-600 dark:text-gray-500"
+                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600"
                   }`}
                 >
                   <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
@@ -84,11 +84,11 @@ export default function GoalCard({
         </div>
       </div>
       {goal.description && (
-        <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">
           {goal.description}
         </p>
       )}
-      <div className="flex items-center justify-between text-xs text-gray-400">
+      <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
         {goal.target_date && (
           <span>Target: {new Date(goal.target_date).toLocaleDateString()}</span>
         )}

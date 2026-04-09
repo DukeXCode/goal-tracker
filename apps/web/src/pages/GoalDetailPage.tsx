@@ -31,20 +31,20 @@ export default function GoalDetailPage() {
       .finally(() => setLoading(false));
   }, [id, navigate]);
 
-  if (loading) return <p className="text-gray-500">Loading...</p>;
+  if (loading) return <p className="text-gray-500 dark:text-gray-400">Loading...</p>;
   if (!goal) return null;
 
   return (
     <div className="space-y-6">
       <button
         onClick={() => navigate("/goals")}
-        className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+        className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
       >
         &larr; Back to Goals
       </button>
 
       {editing ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <GoalForm
             initialData={goal}
             onSubmit={async (data) => {
@@ -56,20 +56,20 @@ export default function GoalDetailPage() {
           />
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-start justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-900">{goal.title}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{goal.title}</h2>
             <button
               onClick={() => setEditing(true)}
-              className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
             >
               Edit
             </button>
           </div>
           {goal.description && (
-            <p className="text-gray-600 mb-4">{goal.description}</p>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{goal.description}</p>
           )}
-          <div className="flex gap-4 text-sm text-gray-500">
+          <div className="flex gap-4 text-sm text-gray-500 dark:text-gray-400">
             <span>Status: {statusLabels[goal.status]}</span>
             {goal.target_date && (
               <span>
@@ -82,19 +82,19 @@ export default function GoalDetailPage() {
 
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             Journal Entries
           </h3>
           <button
             onClick={() => setShowEntryForm(!showEntryForm)}
-            className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
           >
             {showEntryForm ? "Close" : "New Entry"}
           </button>
         </div>
 
         {showEntryForm && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-4">
             <JournalEntryForm
               defaultGoalId={id}
               onSubmit={async (data) => {
@@ -107,7 +107,7 @@ export default function GoalDetailPage() {
         )}
 
         {entries.length === 0 ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             No journal entries for this goal yet.
           </p>
         ) : (

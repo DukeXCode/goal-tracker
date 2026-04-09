@@ -56,7 +56,7 @@ export default function JournalEntryForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Title
         </label>
         <input
@@ -64,25 +64,25 @@ export default function JournalEntryForm({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="Entry title..."
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Content
         </label>
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={6}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="Write your thoughts..."
         />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Mood
           </label>
           <div className="flex gap-2">
@@ -93,8 +93,8 @@ export default function JournalEntryForm({
                 onClick={() => setMood(mood === m.value ? null : m.value)}
                 className={`w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-all ${
                   mood === m.value
-                    ? "bg-blue-100 ring-2 ring-blue-500"
-                    : "bg-gray-100 hover:bg-gray-200"
+                    ? "bg-blue-100 ring-2 ring-blue-500 dark:bg-blue-800/60"
+                    : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
                 }`}
                 title={m.value}
               >
@@ -104,13 +104,13 @@ export default function JournalEntryForm({
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Linked Goal
           </label>
           <select
             value={goalId}
             onChange={(e) => setGoalId(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">None</option>
             {goals.map((g) => (
@@ -125,7 +125,7 @@ export default function JournalEntryForm({
         <button
           type="submit"
           disabled={submitting || !title.trim()}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors"
         >
           {submitting
             ? "Saving..."
@@ -136,7 +136,7 @@ export default function JournalEntryForm({
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+          className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
         >
           Cancel
         </button>

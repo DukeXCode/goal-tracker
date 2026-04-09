@@ -14,14 +14,14 @@ export default function DashboardPage() {
   const recentEntries = entries.slice(0, 5);
 
   if (goalsLoading || entriesLoading) {
-    return <p className="text-gray-500">Loading...</p>;
+    return <p className="text-gray-500 dark:text-gray-400">Loading...</p>;
   }
 
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-1">Dashboard</h2>
-        <p className="text-sm text-gray-500">Your goals and journal at a glance.</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">Dashboard</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Your goals and journal at a glance.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -34,24 +34,24 @@ export default function DashboardPage() {
       <div className="flex gap-3">
         <Link
           to="/goals"
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
         >
           New Goal
         </Link>
         <Link
           to="/journal"
-          className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+          className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 transition-colors"
         >
           New Journal Entry
         </Link>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
           Recent Journal Entries
         </h3>
         {recentEntries.length === 0 ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             No journal entries yet. Start writing!
           </p>
         ) : (
@@ -76,10 +76,10 @@ function StatCard({
   color: string;
 }) {
   const colors: Record<string, string> = {
-    blue: "bg-blue-50 text-blue-700 border-blue-200",
-    gray: "bg-gray-50 text-gray-700 border-gray-200",
-    amber: "bg-amber-50 text-amber-700 border-amber-200",
-    green: "bg-green-50 text-green-700 border-green-200",
+    blue: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700",
+    gray: "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600",
+    amber: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/50 dark:text-amber-300 dark:border-amber-700",
+    green: "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700",
   };
 
   return (

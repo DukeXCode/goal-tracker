@@ -35,20 +35,20 @@ export default function JournalEntryPage() {
       .finally(() => setLoading(false));
   }, [id, navigate]);
 
-  if (loading) return <p className="text-gray-500">Loading...</p>;
+  if (loading) return <p className="text-gray-500 dark:text-gray-400">Loading...</p>;
   if (!entry) return null;
 
   return (
     <div className="space-y-6">
       <button
         onClick={() => navigate("/journal")}
-        className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+        className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
       >
         &larr; Back to Journal
       </button>
 
       {editing ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <JournalEntryForm
             initialData={entry}
             onSubmit={async (data) => {
@@ -66,13 +66,13 @@ export default function JournalEntryPage() {
           />
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {entry.title}
               </h2>
-              <div className="flex items-center gap-3 mt-2 text-sm text-gray-500">
+              <div className="flex items-center gap-3 mt-2 text-sm text-gray-500 dark:text-gray-400">
                 <span>
                   {new Date(entry.created_at).toLocaleDateString()}
                 </span>
@@ -85,27 +85,27 @@ export default function JournalEntryPage() {
             </div>
             <button
               onClick={() => setEditing(true)}
-              className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
             >
               Edit
             </button>
           </div>
 
           {linkedGoal && (
-            <div className="mb-4 px-3 py-2 bg-blue-50 rounded-lg text-sm">
+            <div className="mb-4 px-3 py-2 bg-blue-50 dark:bg-blue-900/50 rounded-lg text-sm">
               Linked to:{" "}
               <Link
                 to={`/goals/${linkedGoal.id}`}
-                className="text-blue-600 font-medium hover:underline"
+                className="text-blue-600 dark:text-blue-400 font-medium hover:underline"
               >
                 {linkedGoal.title}
               </Link>
             </div>
           )}
 
-          <div className="text-gray-700 whitespace-pre-wrap">
+          <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
             {entry.content || (
-              <span className="text-gray-400 italic">No content</span>
+              <span className="text-gray-400 dark:text-gray-500 italic">No content</span>
             )}
           </div>
         </div>

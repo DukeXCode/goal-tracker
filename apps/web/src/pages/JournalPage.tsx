@@ -11,17 +11,17 @@ export default function JournalPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Journal</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Journal</h2>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
         >
           {showForm ? "Close" : "New Entry"}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <JournalEntryForm
             onSubmit={async (data) => {
               await createEntry(data);
@@ -32,11 +32,11 @@ export default function JournalPage() {
         </div>
       )}
 
-      {loading && <p className="text-gray-500">Loading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+      {loading && <p className="text-gray-500 dark:text-gray-400">Loading...</p>}
+      {error && <p className="text-red-500 dark:text-red-400">{error}</p>}
 
       {!loading && entries.length === 0 && (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           No journal entries yet. Start writing!
         </p>
       )}
