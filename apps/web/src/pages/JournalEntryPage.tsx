@@ -74,7 +74,7 @@ export default function JournalEntryPage() {
               </h2>
               <div className="flex items-center gap-3 mt-2 text-sm text-gray-500 dark:text-gray-400">
                 <span>
-                  {new Date(entry.created_at).toLocaleDateString()}
+                  {new Date(entry.created_at).toLocaleDateString("de-DE")}
                 </span>
                 {entry.mood && (
                   <span>

@@ -90,7 +90,7 @@ export default function GoalCard({
       )}
       <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
         {goal.target_date && (
-          <span>Target: {new Date(goal.target_date).toLocaleDateString()}</span>
+          <span>Target: {new Date(goal.target_date).toLocaleDateString("de-DE")}</span>
         )}
         {!goal.target_date && <span />}
         {onDelete && (

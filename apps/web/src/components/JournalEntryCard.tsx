@@ -47,7 +47,7 @@ export default function JournalEntryCard({
         </p>
       )}
       <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
-        <span>{new Date(entry.created_at).toLocaleDateString()}</span>
+        <span>{new Date(entry.created_at).toLocaleDateString("de-DE")}</span>
         {onDelete && (
           <button
             onClick={() => onDelete(entry.id)}

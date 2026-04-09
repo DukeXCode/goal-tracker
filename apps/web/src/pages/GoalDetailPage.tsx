@@ -73,7 +73,7 @@ export default function GoalDetailPage() {
             <span>Status: {statusLabels[goal.status]}</span>
             {goal.target_date && (
               <span>
-                Target: {new Date(goal.target_date).toLocaleDateString()}
+                Target: {new Date(goal.target_date).toLocaleDateString("de-DE")}
               </span>
             )}
           </div>
