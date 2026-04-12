@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { GoalStatus } from "@goal-tracker/shared";
 import { useGoals } from "../hooks/useGoals";
 import GoalCard from "../components/GoalCard";
 import GoalForm from "../components/GoalForm";
 
-const filters: { label: string; value: GoalStatus | undefined }[] = [
+const statusFilters: { label: string; value: GoalStatus | undefined }[] = [
   { label: "All", value: undefined },
   { label: "Not Started", value: "not_started" },
   { label: "In Progress", value: "in_progress" },
@@ -13,8 +13,23 @@ const filters: { label: string; value: GoalStatus | undefined }[] = [
 
 export default function GoalsPage() {
   const [statusFilter, setStatusFilter] = useState<GoalStatus | undefined>();
+  const [dateFilter, setDateFilter] = useState<"today" | "next7days" | null>(null);
   const [showForm, setShowForm] = useState(false);
   const { goals, loading, error, createGoal, updateGoal, deleteGoal } = useGoals(statusFilter);
+
+  const filteredGoals = useMemo(() => {
+    if (!dateFilter) return goals;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const cutoff = dateFilter === "today" ? tomorrow : new Date(today.getTime() + 7 * 86400000);
+    return goals.filter((g) => {
+      if (!g.target_date) return false;
+      const d = new Date(g.target_date);
+      return d >= today && d < cutoff;
+    });
+  }, [goals, dateFilter]);
 
   return (
     <div className="space-y-6">
@@ -40,8 +55,8 @@ export default function GoalsPage() {
         </div>
       )}
 
-      <div className="flex gap-2">
-        {filters.map((f) => (
+      <div className="flex gap-2 flex-wrap">
+        {statusFilters.map((f) => (
           <button
             key={f.label}
             onClick={() => setStatusFilter(f.value)}
@@ -54,17 +69,34 @@ export default function GoalsPage() {
             {f.label}
           </button>
         ))}
+        {(["today", "next7days"] as const).map((df) => (
+          <button
+            key={df}
+            onClick={() => setDateFilter(dateFilter === df ? null : df)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              dateFilter === df
+                ? "bg-blue-100 text-blue-700 dark:bg-blue-800/60 dark:text-blue-300"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
+            }`}
+          >
+            {df === "today" ? "Today" : "Next 7 Days"}
+          </button>
+        ))}
       </div>
 
       {loading && <p className="text-gray-500 dark:text-gray-400">Loading...</p>}
       {error && <p className="text-red-500 dark:text-red-400">{error}</p>}
 
-      {!loading && goals.length === 0 && (
-        <p className="text-sm text-gray-500 dark:text-gray-400">No goals found. Create one to get started!</p>
+      {!loading && filteredGoals.length === 0 && (
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {dateFilter && goals.length > 0
+            ? `No goals with a target date ${dateFilter === "today" ? "today" : "in the next 7 days"}.`
+            : "No goals found. Create one to get started!"}
+        </p>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {goals.map((goal) => (
+        {filteredGoals.map((goal) => (
           <GoalCard
             key={goal.id}
             goal={goal}
