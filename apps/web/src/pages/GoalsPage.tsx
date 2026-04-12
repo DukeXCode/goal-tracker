@@ -32,9 +32,9 @@ export default function GoalsPage() {
   }, [goals, dateFilter]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Goals</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">Goals</h2>
         <button
           onClick={() => setShowForm(!showForm)}
           className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
@@ -44,7 +44,7 @@ export default function GoalsPage() {
       </div>
 
       {showForm && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-6">
           <GoalForm
             onSubmit={async (data) => {
               await createGoal(data);
@@ -55,12 +55,12 @@ export default function GoalsPage() {
         </div>
       )}
 
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex flex-wrap gap-2">
         {statusFilters.map((f) => (
           <button
             key={f.label}
             onClick={() => setStatusFilter(f.value)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-2 md:py-1.5 rounded-lg text-sm font-medium transition-colors ${
               statusFilter === f.value
                 ? "bg-blue-100 text-blue-700 dark:bg-blue-800/60 dark:text-blue-300"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
@@ -73,7 +73,7 @@ export default function GoalsPage() {
           <button
             key={df}
             onClick={() => setDateFilter(dateFilter === df ? null : df)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-2 md:py-1.5 rounded-lg text-sm font-medium transition-colors ${
               dateFilter === df
                 ? "bg-blue-100 text-blue-700 dark:bg-blue-800/60 dark:text-blue-300"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"

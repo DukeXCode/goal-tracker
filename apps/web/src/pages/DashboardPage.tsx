@@ -18,9 +18,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">Dashboard</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">Dashboard</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">Your goals and journal at a glance.</p>
       </div>
 

@@ -40,7 +40,7 @@ export default function JournalEntryPage() {
   if (!entry) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <button
         onClick={() => navigate("/journal")}
         className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
@@ -49,7 +49,7 @@ export default function JournalEntryPage() {
       </button>
 
       {editing ? (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-6">
           <JournalEntryForm
             initialData={entry}
             onSubmit={async (data) => {
@@ -67,10 +67,10 @@ export default function JournalEntryPage() {
           />
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {entry.title}
               </h2>
               <div className="flex items-center gap-3 mt-2 text-sm text-gray-500 dark:text-gray-400">

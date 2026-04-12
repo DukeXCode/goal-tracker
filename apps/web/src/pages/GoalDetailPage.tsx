@@ -35,7 +35,7 @@ export default function GoalDetailPage() {
   if (!goal) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <button
         onClick={() => navigate("/goals")}
         className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
@@ -44,7 +44,7 @@ export default function GoalDetailPage() {
       </button>
 
       {editing ? (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-6">
           <GoalForm
             initialData={goal}
             onSubmit={async (data) => {
@@ -56,9 +56,9 @@ export default function GoalDetailPage() {
           />
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-6">
           <div className="flex items-start justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{goal.title}</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">{goal.title}</h2>
             <button
               onClick={() => setEditing(true)}
               className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
@@ -94,7 +94,7 @@ export default function GoalDetailPage() {
         </div>
 
         {showEntryForm && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-6 mb-4">
             <JournalEntryForm
               defaultGoalId={id}
               onSubmit={async (data) => {

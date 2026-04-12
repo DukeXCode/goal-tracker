@@ -9,9 +9,9 @@ export default function JournalPage() {
     useJournalEntries();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Journal</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">Journal</h2>
         <button
           onClick={() => setShowForm(!showForm)}
           className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
@@ -21,7 +21,7 @@ export default function JournalPage() {
       </div>
 
       {showForm && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-6">
           <JournalEntryForm
             onSubmit={async (data) => {
               await createEntry(data);
