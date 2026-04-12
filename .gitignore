@@ -4,4 +4,5 @@ dist/
 .dev.vars
 *.local
 .env
+!.env.production
 .DS_Store
