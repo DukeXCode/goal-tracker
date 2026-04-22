@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   CoachingTopic,
   CreateCoachingTopicInput,
@@ -7,43 +7,44 @@ import type {
 import { api } from "../lib/api";
 
 export function useCoachingTopics(status: "pending" | "discussed" = "pending") {
-  const [topics, setTopics] = useState<CoachingTopic[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const qc = useQueryClient();
+  const key = ["coaching-topics", status];
 
-  const refresh = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await api.coaching.topics.list(status);
-      setTopics(res.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load topics");
-    } finally {
-      setLoading(false);
-    }
-  }, [status]);
+  const query = useQuery({
+    queryKey: key,
+    queryFn: async () => (await api.coaching.topics.list(status)).data,
+    initialData: () => qc.getQueryData<CoachingTopic[]>(key),
+  });
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ["coaching-topics"] });
+    qc.invalidateQueries({ queryKey: ["coaching-sessions"] });
+  };
 
   const createTopic = async (input: CreateCoachingTopicInput) => {
     const res = await api.coaching.topics.create(input);
-    await refresh();
+    await invalidate();
     return res.data;
   };
 
   const updateTopic = async (id: string, input: UpdateCoachingTopicInput) => {
     const res = await api.coaching.topics.update(id, input);
-    await refresh();
+    await invalidate();
     return res.data;
   };
 
   const deleteTopic = async (id: string) => {
     await api.coaching.topics.delete(id);
-    await refresh();
+    await invalidate();
   };
 
-  return { topics, loading, error, createTopic, updateTopic, deleteTopic, refresh };
+  return {
+    topics: query.data ?? [],
+    loading: query.isLoading,
+    error: query.error ? (query.error as Error).message : null,
+    createTopic,
+    updateTopic,
+    deleteTopic,
+    refresh: () => query.refetch(),
+  };
 }
