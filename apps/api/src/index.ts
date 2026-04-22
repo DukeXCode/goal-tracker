@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { goalRoutes } from "./routes/goals";
 import { journalRoutes } from "./routes/journal";
+import { coachingRoutes } from "./routes/coaching";
 
 export type Bindings = {
   DB: D1Database;
@@ -20,6 +21,7 @@ app.use(
 
 app.route("/api/goals", goalRoutes);
 app.route("/api/journal", journalRoutes);
+app.route("/api/coaching", coachingRoutes);
 
 app.get("/api/health", (c) => c.json({ status: "ok" }));
 

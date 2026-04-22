@@ -50,6 +50,37 @@ export interface UpdateJournalEntryInput {
   goal_id?: string | null;
 }
 
+export interface CoachingTopic {
+  id: string;
+  title: string;
+  session_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CoachingSession {
+  id: string;
+  session_date: string;
+  created_at: string;
+}
+
+export interface CoachingSessionWithTopics extends CoachingSession {
+  topics: CoachingTopic[];
+}
+
+export interface CreateCoachingTopicInput {
+  title: string;
+}
+
+export interface UpdateCoachingTopicInput {
+  title?: string;
+}
+
+export interface CompleteSessionInput {
+  topic_ids: string[];
+  session_date?: string;
+}
+
 export interface ApiResponse<T> {
   data: T;
 }

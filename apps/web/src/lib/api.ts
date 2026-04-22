@@ -5,6 +5,11 @@ import type {
   JournalEntry,
   CreateJournalEntryInput,
   UpdateJournalEntryInput,
+  CoachingTopic,
+  CoachingSessionWithTopics,
+  CreateCoachingTopicInput,
+  UpdateCoachingTopicInput,
+  CompleteSessionInput,
 } from "@goal-tracker/shared";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -59,5 +64,43 @@ export const api = {
       }),
     delete: (id: string) =>
       request<void>(`/journal/${id}`, { method: "DELETE" }),
+  },
+  coaching: {
+    topics: {
+      list: (status: "pending" | "discussed" = "pending") =>
+        request<{ data: CoachingTopic[] }>(
+          `/coaching/topics?status=${status}`
+        ),
+      create: (input: CreateCoachingTopicInput) =>
+        request<{ data: CoachingTopic }>("/coaching/topics", {
+          method: "POST",
+          body: JSON.stringify(input),
+        }),
+      update: (id: string, input: UpdateCoachingTopicInput) =>
+        request<{ data: CoachingTopic }>(`/coaching/topics/${id}`, {
+          method: "PUT",
+          body: JSON.stringify(input),
+        }),
+      delete: (id: string) =>
+        request<void>(`/coaching/topics/${id}`, { method: "DELETE" }),
+    },
+    sessions: {
+      list: () =>
+        request<{ data: CoachingSessionWithTopics[] }>("/coaching/sessions"),
+      get: (id: string) =>
+        request<{ data: CoachingSessionWithTopics }>(
+          `/coaching/sessions/${id}`
+        ),
+      complete: (input: CompleteSessionInput) =>
+        request<{ data: CoachingSessionWithTopics }>(
+          "/coaching/sessions/complete",
+          {
+            method: "POST",
+            body: JSON.stringify(input),
+          }
+        ),
+      delete: (id: string) =>
+        request<void>(`/coaching/sessions/${id}`, { method: "DELETE" }),
+    },
   },
 };

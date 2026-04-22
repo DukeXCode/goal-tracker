@@ -5,6 +5,7 @@ const navItems = [
   { to: "/", label: "Dashboard" },
   { to: "/goals", label: "Goals" },
   { to: "/journal", label: "Journal" },
+  { to: "/coaching", label: "Coaching" },
 ];
 
 export default function Layout() {
