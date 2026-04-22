@@ -1,45 +1,43 @@
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Goal, GoalStatus, CreateGoalInput, UpdateGoalInput } from "@goal-tracker/shared";
 import { api } from "../lib/api";
 
 export function useGoals(statusFilter?: GoalStatus) {
-  const [goals, setGoals] = useState<Goal[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const qc = useQueryClient();
+  const key = ["goals", statusFilter ?? "all"];
 
-  const refresh = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await api.goals.list(statusFilter);
-      setGoals(res.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load goals");
-    } finally {
-      setLoading(false);
-    }
-  }, [statusFilter]);
+  const query = useQuery({
+    queryKey: key,
+    queryFn: async () => (await api.goals.list(statusFilter)).data,
+    initialData: () => qc.getQueryData<Goal[]>(key),
+  });
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["goals"] });
 
   const createGoal = async (input: CreateGoalInput) => {
     const res = await api.goals.create(input);
-    await refresh();
+    await invalidate();
     return res.data;
   };
 
   const updateGoal = async (id: string, input: UpdateGoalInput) => {
     const res = await api.goals.update(id, input);
-    await refresh();
+    await invalidate();
     return res.data;
   };
 
   const deleteGoal = async (id: string) => {
     await api.goals.delete(id);
-    await refresh();
+    await invalidate();
   };
 
-  return { goals, loading, error, createGoal, updateGoal, deleteGoal, refresh };
+  return {
+    goals: query.data ?? [],
+    loading: query.isLoading,
+    error: query.error ? (query.error as Error).message : null,
+    createGoal,
+    updateGoal,
+    deleteGoal,
+    refresh: () => query.refetch(),
+  };
 }

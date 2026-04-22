@@ -13,7 +13,7 @@ const statusFilters: { label: string; value: GoalStatus | undefined }[] = [
 
 export default function GoalsPage() {
   const [statusFilter, setStatusFilter] = useState<GoalStatus | undefined>();
-  const [dateFilter, setDateFilter] = useState<"today" | "next7days" | null>(null);
+  const [dateFilter, setDateFilter] = useState<"today" | "next7days" | "future" | null>(null);
   const [showForm, setShowForm] = useState(false);
   const { goals, loading, error, createGoal, updateGoal, deleteGoal } = useGoals(statusFilter);
 
@@ -23,11 +23,13 @@ export default function GoalsPage() {
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const cutoff = dateFilter === "today" ? tomorrow : new Date(today.getTime() + 7 * 86400000);
+    const weekOut = new Date(today.getTime() + 7 * 86400000);
     return goals.filter((g) => {
       if (!g.target_date) return false;
       const d = new Date(g.target_date);
-      return d >= today && d < cutoff;
+      if (dateFilter === "today") return d >= today && d < tomorrow;
+      if (dateFilter === "next7days") return d >= today && d < weekOut;
+      return d >= weekOut;
     });
   }, [goals, dateFilter]);
 
@@ -69,7 +71,7 @@ export default function GoalsPage() {
             {f.label}
           </button>
         ))}
-        {(["today", "next7days"] as const).map((df) => (
+        {(["today", "next7days", "future"] as const).map((df) => (
           <button
             key={df}
             onClick={() => setDateFilter(dateFilter === df ? null : df)}
@@ -79,7 +81,7 @@ export default function GoalsPage() {
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
             }`}
           >
-            {df === "today" ? "Today" : "Next 7 Days"}
+            {df === "today" ? "Today" : df === "next7days" ? "Next 7 Days" : "In the Future"}
           </button>
         ))}
       </div>
@@ -90,7 +92,7 @@ export default function GoalsPage() {
       {!loading && filteredGoals.length === 0 && (
         <p className="text-sm text-gray-500 dark:text-gray-400">
           {dateFilter && goals.length > 0
-            ? `No goals with a target date ${dateFilter === "today" ? "today" : "in the next 7 days"}.`
+            ? `No goals with a target date ${dateFilter === "today" ? "today" : dateFilter === "next7days" ? "in the next 7 days" : "more than 7 days out"}.`
             : "No goals found. Create one to get started!"}
         </p>
       )}

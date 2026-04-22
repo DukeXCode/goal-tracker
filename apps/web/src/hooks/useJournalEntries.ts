@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   JournalEntry,
   CreateJournalEntryInput,
@@ -7,43 +7,41 @@ import type {
 import { api } from "../lib/api";
 
 export function useJournalEntries(goalId?: string) {
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const qc = useQueryClient();
+  const key = ["journal", goalId ?? "all"];
 
-  const refresh = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await api.journal.list(goalId);
-      setEntries(res.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load entries");
-    } finally {
-      setLoading(false);
-    }
-  }, [goalId]);
+  const query = useQuery({
+    queryKey: key,
+    queryFn: async () => (await api.journal.list(goalId)).data,
+    initialData: () => qc.getQueryData<JournalEntry[]>(key),
+  });
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["journal"] });
 
   const createEntry = async (input: CreateJournalEntryInput) => {
     const res = await api.journal.create(input);
-    await refresh();
+    await invalidate();
     return res.data;
   };
 
   const updateEntry = async (id: string, input: UpdateJournalEntryInput) => {
     const res = await api.journal.update(id, input);
-    await refresh();
+    await invalidate();
     return res.data;
   };
 
   const deleteEntry = async (id: string) => {
     await api.journal.delete(id);
-    await refresh();
+    await invalidate();
   };
 
-  return { entries, loading, error, createEntry, updateEntry, deleteEntry, refresh };
+  return {
+    entries: query.data ?? [],
+    loading: query.isLoading,
+    error: query.error ? (query.error as Error).message : null,
+    createEntry,
+    updateEntry,
+    deleteEntry,
+    refresh: () => query.refetch(),
+  };
 }

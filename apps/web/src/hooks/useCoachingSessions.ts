@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   CoachingSessionWithTopics,
   CompleteSessionInput,
@@ -6,37 +6,37 @@ import type {
 import { api } from "../lib/api";
 
 export function useCoachingSessions() {
-  const [sessions, setSessions] = useState<CoachingSessionWithTopics[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const qc = useQueryClient();
+  const key = ["coaching-sessions"];
 
-  const refresh = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await api.coaching.sessions.list();
-      setSessions(res.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load sessions");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const query = useQuery({
+    queryKey: key,
+    queryFn: async () => (await api.coaching.sessions.list()).data,
+    initialData: () => qc.getQueryData<CoachingSessionWithTopics[]>(key),
+  });
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ["coaching-sessions"] });
+    qc.invalidateQueries({ queryKey: ["coaching-topics"] });
+  };
 
   const completeSession = async (input: CompleteSessionInput) => {
     const res = await api.coaching.sessions.complete(input);
-    await refresh();
+    await invalidate();
     return res.data;
   };
 
   const deleteSession = async (id: string) => {
     await api.coaching.sessions.delete(id);
-    await refresh();
+    await invalidate();
   };
 
-  return { sessions, loading, error, completeSession, deleteSession, refresh };
+  return {
+    sessions: query.data ?? [],
+    loading: query.isLoading,
+    error: query.error ? (query.error as Error).message : null,
+    completeSession,
+    deleteSession,
+    refresh: () => query.refetch(),
+  };
 }
