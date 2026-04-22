@@ -26,19 +26,13 @@ Bun monorepo with three workspaces:
 
 ## Data Model
 
-Two tables in D1: `goals` and `journal_entries`. Journal entries optionally link to a goal via `goal_id` (SET NULL on delete). Schema lives in `apps/api/src/db/schema.sql`; migrations in `src/db/migrations/`.
+Current schema in `apps/api//apps/api/src/db/schema.sql`
 
 ## API Routes
 
 All routes are prefixed with `/api`:
-- `/api/goals` — CRUD, filterable by `?status=`
-- `/api/journal` — CRUD, filterable by `?goal_id=`
-- `/api/health` — health check
-
 Responses wrap data in `{ data: ... }` (or `{ error: ... }` on failure).
 
 ## Frontend Patterns
 
-- API client in `src/lib/api.ts` — typed wrapper around fetch
-- Custom hooks (`useGoals`, `useJournalEntries`) manage fetch state
 - Pages are in `src/pages/`, reusable components in `src/components/`
