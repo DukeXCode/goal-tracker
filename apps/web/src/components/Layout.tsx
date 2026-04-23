@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../context/AuthContext";
 
 const navItems = [
   { to: "/", label: "Dashboard" },
@@ -10,6 +12,15 @@ const navItems = [
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const handleLogout = () => {
+    logout();
+    queryClient.clear();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -66,6 +77,14 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <button
+            onClick={handleLogout}
+            className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-100"
+          >
+            Sign out
+          </button>
+        </div>
       </aside>
 
       <main className="flex-1 overflow-auto p-4 pt-24 md:p-8 md:pt-8">

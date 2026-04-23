@@ -10,7 +10,7 @@
     "@goal-tracker/shared": "workspace:*"
   },
   "devDependencies": {
-    "wrangler": "^3",
+    "wrangler": "4",
     "@cloudflare/workers-types": "^4"
   }
 }
