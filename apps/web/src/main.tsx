@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
+import { AuthProvider } from "./context/AuthContext";
 import App from "./App";
 import "./index.css";
 
@@ -29,7 +30,9 @@ createRoot(document.getElementById("root")!).render(
       persistOptions={{ persister, maxAge: 1000 * 60 * 60 * 24 * 7 }}
     >
       <BrowserRouter>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </BrowserRouter>
     </PersistQueryClientProvider>
   </StrictMode>
