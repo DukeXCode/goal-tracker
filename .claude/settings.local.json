@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(curl -s -v -X POST http://localhost:8787/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"\"\"email\"\"\"\":\"\"\"\"test@example.com\"\"\"\",\"\"\"\"password\"\"\"\":\"\"\"\"password123\"\"\"\"}')",
+      "Bash(export PATH=\"$HOME/.bun/bin:$PATH\")",
+      "Bash(bun run:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npx wrangler:*)",
+      "Bash(VITE_API_URL=https://goal-tracker-api.naim-giger.workers.dev bun run build)",
+      "Bash(curl -s https://goal-tracker-api.naim-giger.workers.dev/api/health)",
+      "Bash(curl -s https://goal-tracker-api.naim-giger.workers.dev/api/goals)"
+    ]
+  }
+}

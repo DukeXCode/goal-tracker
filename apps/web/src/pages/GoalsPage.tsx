@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import type { GoalStatus } from "@goal-tracker/shared";
 import { useGoals } from "../hooks/useGoals";
+import { useLocalStorageState } from "../hooks/useLocalStorageState";
 import GoalCard from "../components/GoalCard";
 import GoalForm from "../components/GoalForm";
 
@@ -12,8 +13,14 @@ const statusFilters: { label: string; value: GoalStatus | undefined }[] = [
 ];
 
 export default function GoalsPage() {
-  const [statusFilter, setStatusFilter] = useState<GoalStatus | undefined>();
-  const [dateFilter, setDateFilter] = useState<"today" | "next7days" | "future" | null>(null);
+  const [statusFilter, setStatusFilter] = useLocalStorageState<GoalStatus | undefined>(
+    "goals.statusFilter",
+    undefined,
+  );
+  const [dateFilter, setDateFilter] = useLocalStorageState<"today" | "next7days" | "future" | null>(
+    "goals.dateFilter",
+    null,
+  );
   const [showForm, setShowForm] = useState(false);
   const { goals, loading, error, createGoal, updateGoal, deleteGoal } = useGoals(statusFilter);
 
