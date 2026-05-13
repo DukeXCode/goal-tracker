@@ -11,7 +11,7 @@ export default function Markdown({ content }: { content: string }) {
 
   return (
     <div
-      className="prose prose-sm dark:prose-invert max-w-none"
+      className="prose prose-sm prose-invert prose-purple max-w-none prose-headings:text-text-primary prose-p:text-text-secondary prose-a:text-accent prose-strong:text-text-primary prose-code:text-accent prose-code:bg-surface-tertiary prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-surface-tertiary prose-pre:border prose-pre:border-border-primary"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

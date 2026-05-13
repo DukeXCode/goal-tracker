@@ -36,20 +36,33 @@ export default function JournalEntryPage() {
       .finally(() => setLoading(false));
   }, [id, navigate]);
 
-  if (loading) return <p className="text-gray-500 dark:text-gray-400">Loading...</p>;
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 text-text-tertiary py-12">
+        <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+        <span className="text-sm">Loading...</span>
+      </div>
+    );
+  }
   if (!entry) return null;
 
   return (
     <div className="space-y-4 md:space-y-6">
       <button
         onClick={() => navigate("/journal")}
-        className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-text-tertiary hover:text-text-primary transition-colors"
       >
-        &larr; Back to Journal
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Journal
       </button>
 
       {editing ? (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+        <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 md:p-6">
           <JournalEntryForm
             initialData={entry}
             onSubmit={async (data) => {
@@ -67,18 +80,18 @@ export default function JournalEntryPage() {
           />
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+        <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 md:p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <h2 className="text-xl md:text-2xl font-bold text-text-primary">
                 {entry.title}
               </h2>
-              <div className="flex items-center gap-3 mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-3 mt-2 text-sm text-text-tertiary">
                 <span>
                   {new Date(entry.created_at).toLocaleDateString("de-DE")}
                 </span>
                 {entry.mood && (
-                  <span>
+                  <span className="flex items-center gap-1">
                     {moodEmoji[entry.mood]} Feeling {entry.mood}
                   </span>
                 )}
@@ -86,29 +99,29 @@ export default function JournalEntryPage() {
             </div>
             <button
               onClick={() => setEditing(true)}
-              className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
+              className="px-3 py-1.5 text-sm font-medium text-accent hover:bg-accent-muted rounded-lg transition-colors"
             >
               Edit
             </button>
           </div>
 
           {linkedGoal && (
-            <div className="mb-4 px-3 py-2 bg-blue-50 dark:bg-blue-900/50 rounded-lg text-sm">
+            <div className="mb-4 px-3 py-2 bg-accent-subtle rounded-lg text-sm border border-accent/20">
               Linked to:{" "}
               <Link
                 to={`/goals/${linkedGoal.id}`}
-                className="text-blue-600 dark:text-blue-400 font-medium hover:underline"
+                className="text-accent font-medium hover:underline"
               >
                 {linkedGoal.title}
               </Link>
             </div>
           )}
 
-          <div className="text-gray-700 dark:text-gray-300">
+          <div className="text-text-secondary">
             {entry.content ? (
               <Markdown content={entry.content} />
             ) : (
-              <span className="text-gray-400 dark:text-gray-500 italic">No content</span>
+              <span className="text-text-tertiary italic">No content</span>
             )}
           </div>
         </div>

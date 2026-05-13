@@ -43,17 +43,17 @@ export default function GoalsPage() {
   return (
     <div className="space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">Goals</h2>
+        <h2 className="text-2xl font-bold text-text-primary">Goals</h2>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
+          className="px-4 py-2.5 bg-accent hover:bg-accent-hover text-white text-sm font-semibold rounded-lg transition-colors"
         >
           {showForm ? "Close" : "New Goal"}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+        <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 md:p-6">
           <GoalForm
             onSubmit={async (data) => {
               await createGoal(data);
@@ -71,21 +71,22 @@ export default function GoalsPage() {
             onClick={() => setStatusFilter(f.value)}
             className={`px-3 py-2 md:py-1.5 rounded-lg text-sm font-medium transition-colors ${
               statusFilter === f.value
-                ? "bg-blue-100 text-blue-700 dark:bg-blue-800/60 dark:text-blue-300"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
+                ? "bg-accent-muted text-accent"
+                : "bg-surface-tertiary text-text-secondary hover:bg-surface-hover"
             }`}
           >
             {f.label}
           </button>
         ))}
+        <div className="w-px bg-border-primary mx-1 hidden md:block" />
         {(["today", "next7days", "future"] as const).map((df) => (
           <button
             key={df}
             onClick={() => setDateFilter(dateFilter === df ? null : df)}
             className={`px-3 py-2 md:py-1.5 rounded-lg text-sm font-medium transition-colors ${
               dateFilter === df
-                ? "bg-blue-100 text-blue-700 dark:bg-blue-800/60 dark:text-blue-300"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
+                ? "bg-accent-muted text-accent"
+                : "bg-surface-tertiary text-text-secondary hover:bg-surface-hover"
             }`}
           >
             {df === "today" ? "Today" : df === "next7days" ? "Next 7 Days" : "In the Future"}
@@ -93,18 +94,30 @@ export default function GoalsPage() {
         ))}
       </div>
 
-      {loading && <p className="text-gray-500 dark:text-gray-400">Loading...</p>}
-      {error && <p className="text-red-500 dark:text-red-400">{error}</p>}
-
-      {!loading && filteredGoals.length === 0 && (
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {dateFilter && goals.length > 0
-            ? `No goals with a target date ${dateFilter === "today" ? "today" : dateFilter === "next7days" ? "in the next 7 days" : "more than 7 days out"}.`
-            : "No goals found. Create one to get started!"}
-        </p>
+      {loading && (
+        <div className="flex items-center gap-2 text-text-tertiary py-8">
+          <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <span className="text-sm">Loading...</span>
+        </div>
+      )}
+      {error && (
+        <div className="rounded-lg bg-danger-muted px-3 py-2 text-sm text-danger">{error}</div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {!loading && filteredGoals.length === 0 && (
+        <div className="rounded-xl border border-border-primary bg-surface-secondary p-8 text-center">
+          <p className="text-sm text-text-tertiary">
+            {dateFilter && goals.length > 0
+              ? `No goals with a target date ${dateFilter === "today" ? "today" : dateFilter === "next7days" ? "in the next 7 days" : "more than 7 days out"}.`
+              : "No goals found. Create one to get started!"}
+          </p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
         {filteredGoals.map((goal) => (
           <GoalCard
             key={goal.id}
