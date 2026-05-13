@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Goal } from "@goal-tracker/shared";
 import { api } from "../lib/api";
 import { useJournalEntries } from "../hooks/useJournalEntries";
@@ -7,37 +8,26 @@ import GoalForm from "../components/GoalForm";
 import JournalEntryCard from "../components/JournalEntryCard";
 import JournalEntryForm from "../components/JournalEntryForm";
 
-const statusLabels: Record<string, string> = {
-  not_started: "Not Started",
-  in_progress: "In Progress",
-  completed: "Completed",
-};
-
-const statusStyles: Record<string, string> = {
-  not_started: "bg-surface-tertiary text-text-secondary",
-  in_progress: "bg-warning-muted text-warning",
-  completed: "bg-success-muted text-success",
-};
-
 export default function GoalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [goal, setGoal] = useState<Goal | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
+  const qc = useQueryClient();
+
+  const { data: goal, isLoading } = useQuery({
+    queryKey: ["goal", id],
+    queryFn: async () => (await api.goals.get(id!)).data,
+    enabled: !!id,
+    initialData: () => {
+      const cached = qc.getQueryData<Goal[]>(["goals", "all"]);
+      return cached?.find((g) => g.id === id);
+    },
+  });
+
+  const [editing, setEditing] = useState(true);
   const [showEntryForm, setShowEntryForm] = useState(false);
   const { entries, createEntry, deleteEntry } = useJournalEntries(id);
 
-  useEffect(() => {
-    if (!id) return;
-    api.goals
-      .get(id)
-      .then((res) => setGoal(res.data))
-      .catch(() => navigate("/goals"))
-      .finally(() => setLoading(false));
-  }, [id, navigate]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center gap-2 text-text-tertiary py-12">
         <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -48,7 +38,10 @@ export default function GoalDetailPage() {
       </div>
     );
   }
-  if (!goal) return null;
+  if (!goal) {
+    navigate("/goals");
+    return null;
+  }
 
   return (
     <div className="space-y-4 md:space-y-6">
@@ -68,7 +61,8 @@ export default function GoalDetailPage() {
             initialData={goal}
             onSubmit={async (data) => {
               const res = await api.goals.update(goal.id, data);
-              setGoal(res.data);
+              qc.setQueryData(["goal", id], res.data);
+              qc.invalidateQueries({ queryKey: ["goals"] });
               setEditing(false);
             }}
             onCancel={() => setEditing(false)}
@@ -88,19 +82,6 @@ export default function GoalDetailPage() {
           {goal.description && (
             <p className="text-text-secondary mb-4">{goal.description}</p>
           )}
-          <div className="flex flex-wrap gap-3 text-sm">
-            <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${statusStyles[goal.status]}`}>
-              {statusLabels[goal.status]}
-            </span>
-            {goal.target_date && (
-              <span className="text-text-tertiary flex items-center gap-1.5">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                {new Date(goal.target_date).toLocaleDateString("de-DE")}
-              </span>
-            )}
-          </div>
         </div>
       )}
 

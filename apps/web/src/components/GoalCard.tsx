@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import type { Goal, GoalStatus } from "@goal-tracker/shared";
 
 const statusColors: Record<string, string> = {
@@ -31,6 +31,7 @@ export default function GoalCard({
   onDelete?: (id: string) => void;
   onStatusChange?: (id: string, status: GoalStatus) => void;
 }) {
+  const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -47,15 +48,15 @@ export default function GoalCard({
   }, [dropdownOpen]);
 
   return (
-    <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 md:p-5 hover:border-border-hover transition-all group">
+    <div
+      onClick={() => navigate(`/goals/${goal.id}`)}
+      className="bg-surface-secondary rounded-xl border border-border-primary p-4 md:p-5 hover:border-border-hover transition-all group cursor-pointer"
+    >
       <div className="flex items-start justify-between mb-3">
-        <Link
-          to={`/goals/${goal.id}`}
-          className="text-base font-semibold text-text-primary hover:text-accent transition-colors"
-        >
+        <span className="text-base font-semibold text-text-primary group-hover:text-accent transition-colors">
           {goal.title}
-        </Link>
-        <div className="relative" ref={dropdownRef}>
+        </span>
+        <div className="relative" ref={dropdownRef} onClick={(e) => e.stopPropagation()}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer hover:ring-2 hover:ring-accent/30 transition-all ${statusColors[goal.status]}`}
@@ -105,7 +106,7 @@ export default function GoalCard({
         )}
         {onDelete && (
           <button
-            onClick={() => onDelete(goal.id)}
+            onClick={(e) => { e.stopPropagation(); onDelete(goal.id); }}
             className="text-text-tertiary hover:text-danger transition-colors md:opacity-0 md:group-hover:opacity-100"
           >
             Delete
