@@ -58,7 +58,7 @@ export default function JournalEntryForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label className="block text-sm font-medium text-text-secondary mb-1.5">
           Title
         </label>
         <input
@@ -66,23 +66,23 @@ export default function JournalEntryForm({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2.5 border border-border-primary rounded-lg text-sm bg-surface-tertiary text-text-primary placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-colors"
           placeholder="Entry title..."
         />
       </div>
       <div>
-        <div className="flex items-center justify-between mb-1">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="block text-sm font-medium text-text-secondary">
             Content
           </label>
-          <div className="flex gap-1 text-xs">
+          <div className="flex gap-0.5 bg-surface-tertiary rounded-lg p-0.5">
             <button
               type="button"
               onClick={() => setPreview(false)}
-              className={`px-2 py-1 rounded transition-colors ${
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
                 !preview
-                  ? "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200"
-                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  ? "bg-surface-hover text-text-primary"
+                  : "text-text-tertiary hover:text-text-secondary"
               }`}
             >
               Write
@@ -90,10 +90,10 @@ export default function JournalEntryForm({
             <button
               type="button"
               onClick={() => setPreview(true)}
-              className={`px-2 py-1 rounded transition-colors ${
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
                 preview
-                  ? "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200"
-                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  ? "bg-surface-hover text-text-primary"
+                  : "text-text-tertiary hover:text-text-secondary"
               }`}
             >
               Preview
@@ -101,11 +101,11 @@ export default function JournalEntryForm({
           </div>
         </div>
         {preview ? (
-          <div className="w-full min-h-[10rem] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 overflow-auto">
+          <div className="w-full min-h-[10rem] px-3 py-2.5 border border-border-primary rounded-lg text-sm bg-surface-tertiary text-text-primary overflow-auto">
             {content ? (
               <Markdown content={content} />
             ) : (
-              <p className="text-gray-400 dark:text-gray-500 italic">Nothing to preview</p>
+              <p className="text-text-tertiary italic">Nothing to preview</p>
             )}
           </div>
         ) : (
@@ -113,14 +113,14 @@ export default function JournalEntryForm({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={8}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2.5 border border-border-primary rounded-lg text-sm bg-surface-tertiary text-text-primary placeholder-text-tertiary font-mono focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-colors"
             placeholder="Write in markdown... **bold**, *italic*, # headings, - lists, etc."
           />
         )}
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-text-secondary mb-2">
             Mood
           </label>
           <div className="flex gap-2">
@@ -129,10 +129,10 @@ export default function JournalEntryForm({
                 key={m.value}
                 type="button"
                 onClick={() => setMood(mood === m.value ? null : m.value)}
-                className={`w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-all ${
+                className={`w-10 h-10 rounded-lg text-lg flex items-center justify-center transition-all ${
                   mood === m.value
-                    ? "bg-blue-100 ring-2 ring-blue-500 dark:bg-blue-800/60"
-                    : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+                    ? "bg-accent-muted ring-2 ring-accent"
+                    : "bg-surface-tertiary hover:bg-surface-hover border border-border-primary"
                 }`}
                 title={m.value}
               >
@@ -142,13 +142,13 @@ export default function JournalEntryForm({
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">
             Linked Goal
           </label>
           <select
             value={goalId}
             onChange={(e) => setGoalId(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2.5 border border-border-primary rounded-lg text-sm bg-surface-tertiary text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-colors"
           >
             <option value="">None</option>
             {goals.map((g) => (
@@ -163,7 +163,7 @@ export default function JournalEntryForm({
         <button
           type="submit"
           disabled={submitting || !title.trim()}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors"
+          className="px-4 py-2.5 bg-accent text-white text-sm font-semibold rounded-lg hover:bg-accent-hover disabled:opacity-50 transition-colors"
         >
           {submitting
             ? "Saving..."
@@ -174,7 +174,7 @@ export default function JournalEntryForm({
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+          className="px-4 py-2.5 bg-surface-tertiary text-text-secondary text-sm font-medium rounded-lg hover:bg-surface-hover border border-border-primary transition-colors"
         >
           Cancel
         </button>

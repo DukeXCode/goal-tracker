@@ -3,9 +3,15 @@ import { Link } from "react-router-dom";
 import type { Goal, GoalStatus } from "@goal-tracker/shared";
 
 const statusColors: Record<string, string> = {
-  not_started: "bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300",
-  in_progress: "bg-blue-100 text-blue-700 dark:bg-blue-800/60 dark:text-blue-300",
-  completed: "bg-green-100 text-green-700 dark:bg-green-800/60 dark:text-green-300",
+  not_started: "bg-surface-tertiary text-text-secondary",
+  in_progress: "bg-warning-muted text-warning",
+  completed: "bg-success-muted text-success",
+};
+
+const statusDots: Record<string, string> = {
+  not_started: "bg-text-tertiary",
+  in_progress: "bg-warning",
+  completed: "bg-success",
 };
 
 const statusLabels: Record<string, string> = {
@@ -41,23 +47,23 @@ export default function GoalCard({
   }, [dropdownOpen]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-5 hover:shadow-md transition-shadow">
+    <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 md:p-5 hover:border-border-hover transition-all group">
       <div className="flex items-start justify-between mb-3">
         <Link
           to={`/goals/${goal.id}`}
-          className="text-base font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          className="text-base font-semibold text-text-primary hover:text-accent transition-colors"
         >
           {goal.title}
         </Link>
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className={`px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:ring-2 hover:ring-offset-1 hover:ring-blue-300 transition-all ${statusColors[goal.status]}`}
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer hover:ring-2 hover:ring-accent/30 transition-all ${statusColors[goal.status]}`}
           >
             {statusLabels[goal.status]}
           </button>
           {dropdownOpen && (
-            <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10 py-1 min-w-[140px]">
+            <div className="absolute right-0 top-full mt-1.5 bg-surface-tertiary border border-border-primary rounded-lg shadow-xl shadow-black/30 z-10 py-1 min-w-[140px]">
               {allStatuses.map((s) => (
                 <button
                   key={s}
@@ -67,15 +73,13 @@ export default function GoalCard({
                     }
                     setDropdownOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-1.5 text-xs font-medium transition-colors ${
+                  className={`w-full text-left px-3 py-2 text-xs font-medium transition-colors flex items-center gap-2 ${
                     s === goal.status
-                      ? "bg-gray-50 text-gray-400 dark:bg-gray-600 dark:text-gray-500"
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600"
+                      ? "text-text-tertiary"
+                      : "text-text-secondary hover:bg-surface-hover hover:text-text-primary"
                   }`}
                 >
-                  <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                    s === "not_started" ? "bg-gray-400" : s === "in_progress" ? "bg-blue-500" : "bg-green-500"
-                  }`} />
+                  <span className={`w-2 h-2 rounded-full ${statusDots[s]}`} />
                   {statusLabels[s]}
                 </button>
               ))}
@@ -84,19 +88,25 @@ export default function GoalCard({
         </div>
       </div>
       {goal.description && (
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">
+        <p className="text-sm text-text-tertiary mb-3 line-clamp-2">
           {goal.description}
         </p>
       )}
-      <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
-        {goal.target_date && (
-          <span>Target: {new Date(goal.target_date).toLocaleDateString("de-DE")}</span>
+      <div className="flex items-center justify-between text-xs text-text-tertiary">
+        {goal.target_date ? (
+          <span className="flex items-center gap-1">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            {new Date(goal.target_date).toLocaleDateString("de-DE")}
+          </span>
+        ) : (
+          <span />
         )}
-        {!goal.target_date && <span />}
         {onDelete && (
           <button
             onClick={() => onDelete(goal.id)}
-            className="text-red-400 hover:text-red-600 transition-colors"
+            className="text-text-tertiary hover:text-danger transition-colors md:opacity-0 md:group-hover:opacity-100"
           >
             Delete
           </button>
