@@ -1,0 +1,1253 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Goal Tracker API",
+    "version": "0.0.1",
+    "description": "A goal tracking API with journal entries and AI coaching sessions. All responses are wrapped in `{ data: T }` on success or `{ error: string }` on failure."
+  },
+  "servers": [
+    {
+      "url": "/api",
+      "description": "API base path"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "operationId": "get_health",
+        "summary": "Health Check",
+        "description": "Returns the API health status. No authentication required.",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "post_auth_login",
+        "summary": "Login",
+        "description": "Authenticate with username and password to receive a JWT token. The token is valid for 7 days.",
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "description": "The username"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "The password"
+                  }
+                },
+                "required": [
+                  "username",
+                  "password"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "operationId": "get_auth_me",
+        "summary": "Get Current User",
+        "description": "Returns the currently authenticated user's username from the JWT token.",
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/goals": {
+      "get": {
+        "operationId": "get_goals",
+        "summary": "List Goals",
+        "description": "Returns all goals ordered by creation date (newest first). Optionally filter by status.",
+        "tags": [
+          "Goals"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Goal"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "not_started",
+                "in_progress",
+                "completed"
+              ],
+              "nullable": false
+            },
+            "description": "Filter goals by status"
+          }
+        ]
+      },
+      "post": {
+        "operationId": "post_goals",
+        "summary": "Create Goal",
+        "description": "Create a new goal. The `title` field is required and must be non-empty after trimming.",
+        "tags": [
+          "Goals"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Goal"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Goal title"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Goal description"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "not_started",
+                      "in_progress",
+                      "completed"
+                    ],
+                    "nullable": false,
+                    "description": "Goal status"
+                  },
+                  "target_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Target completion date (ISO 8601)"
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/goals/:id": {
+      "get": {
+        "operationId": "get_goals_by_id",
+        "summary": "Get Goal",
+        "description": "Returns a single goal by its ID.",
+        "tags": [
+          "Goals"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Goal"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id"
+          }
+        ]
+      },
+      "put": {
+        "operationId": "put_goals_by_id",
+        "summary": "Update Goal",
+        "description": "Update an existing goal. Only provided fields are updated; omitted fields keep their current values.",
+        "tags": [
+          "Goals"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Goal"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Goal title"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Goal description"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "not_started",
+                      "in_progress",
+                      "completed"
+                    ],
+                    "nullable": false,
+                    "description": "Goal status"
+                  },
+                  "target_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Target completion date (ISO 8601)"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_goals_by_id",
+        "summary": "Delete Goal",
+        "description": "Delete a goal by its ID. Associated journal entries will have their `goal_id` set to null.",
+        "tags": [
+          "Goals"
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id"
+          }
+        ]
+      }
+    },
+    "/api/journal": {
+      "get": {
+        "operationId": "get_journal",
+        "summary": "List Journal Entries",
+        "description": "Returns all journal entries ordered by creation date (newest first). Optionally filter by linked goal.",
+        "tags": [
+          "Journal"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/JournalEntry"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "goal_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter entries by linked goal ID"
+          }
+        ]
+      },
+      "post": {
+        "operationId": "post_journal",
+        "summary": "Create Journal Entry",
+        "description": "Create a new journal entry. The `title` field is required. If `goal_id` is provided, it must reference an existing goal.",
+        "tags": [
+          "Journal"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JournalEntry"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Entry title"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Entry content/body"
+                  },
+                  "mood": {
+                    "type": "string",
+                    "enum": [
+                      "great",
+                      "good",
+                      "okay",
+                      "bad",
+                      "terrible"
+                    ],
+                    "nullable": true,
+                    "description": "How you're feeling"
+                  },
+                  "goal_id": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Link to a goal"
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/journal/:id": {
+      "get": {
+        "operationId": "get_journal_by_id",
+        "summary": "Get Journal Entry",
+        "description": "Returns a single journal entry by its ID.",
+        "tags": [
+          "Journal"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JournalEntry"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id"
+          }
+        ]
+      },
+      "put": {
+        "operationId": "put_journal_by_id",
+        "summary": "Update Journal Entry",
+        "description": "Update an existing journal entry. If `goal_id` is provided and non-null, the referenced goal must exist.",
+        "tags": [
+          "Journal"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JournalEntry"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Entry title"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Entry content/body"
+                  },
+                  "mood": {
+                    "type": "string",
+                    "enum": [
+                      "great",
+                      "good",
+                      "okay",
+                      "bad",
+                      "terrible"
+                    ],
+                    "nullable": true,
+                    "description": "How you're feeling"
+                  },
+                  "goal_id": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Link to a goal"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_journal_by_id",
+        "summary": "Delete Journal Entry",
+        "description": "Delete a journal entry by its ID.",
+        "tags": [
+          "Journal"
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id"
+          }
+        ]
+      }
+    },
+    "/api/coaching/topics": {
+      "get": {
+        "operationId": "get_coaching_topics",
+        "summary": "List Coaching Topics",
+        "description": "Returns coaching topics. By default, returns only pending topics (not yet discussed). Use `status` to filter.",
+        "tags": [
+          "Coaching"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CoachingTopic"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "discussed",
+                "all"
+              ],
+              "nullable": false
+            },
+            "description": "Filter by topic status"
+          }
+        ]
+      },
+      "post": {
+        "operationId": "post_coaching_topics",
+        "summary": "Create Coaching Topic",
+        "description": "Create a new coaching topic. Topics are always created as \"pending\" (not linked to any session).",
+        "tags": [
+          "Coaching"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CoachingTopic"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Topic title"
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/coaching/topics/:id": {
+      "put": {
+        "operationId": "put_coaching_topics_by_id",
+        "summary": "Update Coaching Topic",
+        "description": "Update a coaching topic's title. The `session_id` is managed by the session completion endpoint.",
+        "tags": [
+          "Coaching"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CoachingTopic"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Topic title"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_coaching_topics_by_id",
+        "summary": "Delete Coaching Topic",
+        "description": "Delete a coaching topic by its ID.",
+        "tags": [
+          "Coaching"
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id"
+          }
+        ]
+      }
+    },
+    "/api/coaching/sessions": {
+      "get": {
+        "operationId": "get_coaching_sessions",
+        "summary": "List Coaching Sessions",
+        "description": "Returns all coaching sessions ordered by date (newest first), with their associated topics nested inside.",
+        "tags": [
+          "Coaching"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CoachingSession"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/coaching/sessions/:id": {
+      "get": {
+        "operationId": "get_coaching_sessions_by_id",
+        "summary": "Get Coaching Session",
+        "description": "Returns a single coaching session with its associated topics.",
+        "tags": [
+          "Coaching"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CoachingSession"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id"
+          }
+        ]
+      },
+      "put": {
+        "operationId": "put_coaching_sessions_by_id",
+        "summary": "Update Coaching Session",
+        "description": "Update a coaching session's date.",
+        "tags": [
+          "Coaching"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CoachingSession"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_date": {
+                    "type": "string",
+                    "description": "New session date (ISO 8601)"
+                  }
+                },
+                "required": [
+                  "session_date"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_coaching_sessions_by_id",
+        "summary": "Delete Coaching Session",
+        "description": "Delete a coaching session by its ID. Associated topics revert to \"pending\" status (their `session_id` is set to null).",
+        "tags": [
+          "Coaching"
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id"
+          }
+        ]
+      }
+    },
+    "/api/coaching/sessions/complete": {
+      "post": {
+        "operationId": "post_coaching_sessions_complete",
+        "summary": "Complete Coaching Session",
+        "description": "Complete a coaching session by grouping pending topics into a new session. All provided `topic_ids` must reference pending topics (not already attached to a session). This operation is atomic — the session is created and topics are linked in a single database transaction.",
+        "tags": [
+          "Coaching"
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CoachingSession"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "topic_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of pending topic IDs to include in this session"
+                  },
+                  "session_date": {
+                    "type": "string",
+                    "description": "Session date (ISO 8601)"
+                  }
+                },
+                "required": [
+                  "topic_ids"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token from POST /api/auth/login"
+      }
+    },
+    "schemas": {
+      "Goal": {
+        "type": "object",
+        "description": "A tracking goal with title, description, status, and optional target date.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "Goal title"
+          },
+          "description": {
+            "type": "string",
+            "description": "Goal description"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "not_started",
+              "in_progress",
+              "completed"
+            ],
+            "nullable": false,
+            "description": "Current status"
+          },
+          "target_date": {
+            "type": "string",
+            "nullable": true,
+            "description": "Target completion date"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp (ISO 8601)"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update timestamp (ISO 8601)"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "status",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "JournalEntry": {
+        "type": "object",
+        "description": "A journal entry with optional mood and goal linkage.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "Entry title"
+          },
+          "content": {
+            "type": "string",
+            "description": "Entry content/body"
+          },
+          "mood": {
+            "type": "string",
+            "enum": [
+              "great",
+              "good",
+              "okay",
+              "bad",
+              "terrible"
+            ],
+            "nullable": true,
+            "description": "Mood rating"
+          },
+          "goal_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Linked goal ID"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp (ISO 8601)"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update timestamp (ISO 8601)"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "content",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "CoachingTopic": {
+        "type": "object",
+        "description": "A coaching topic. Pending topics have `session_id: null`; discussed topics are linked to a session.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "Topic title"
+          },
+          "session_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Linked session ID (null = pending)"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp (ISO 8601)"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update timestamp (ISO 8601)"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "CoachingSession": {
+        "type": "object",
+        "description": "A coaching session containing discussed topics.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID identifier"
+          },
+          "session_date": {
+            "type": "string",
+            "description": "Session date (ISO 8601)"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp (ISO 8601)"
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoachingTopic"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "session_date",
+          "created_at",
+          "topics"
+        ]
+      }
+    }
+  }
+}
