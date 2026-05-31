@@ -6,10 +6,12 @@ import type {
   CreateJournalEntryInput,
   UpdateJournalEntryInput,
   CoachingTopic,
+  CoachingSession,
   CoachingSessionWithTopics,
   CreateCoachingTopicInput,
   UpdateCoachingTopicInput,
   CompleteSessionInput,
+  UpdateCoachingSessionInput,
 } from "@goal-tracker/shared";
 import { getStoredToken } from "../context/AuthContext";
 
@@ -108,6 +110,11 @@ export const api = {
             body: JSON.stringify(input),
           }
         ),
+      update: (id: string, input: UpdateCoachingSessionInput) =>
+        request<{ data: CoachingSession }>(`/coaching/sessions/${id}`, {
+          method: "PUT",
+          body: JSON.stringify(input),
+        }),
       delete: (id: string) =>
         request<void>(`/coaching/sessions/${id}`, { method: "DELETE" }),
     },

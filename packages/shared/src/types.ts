@@ -81,6 +81,10 @@ export interface CompleteSessionInput {
   session_date?: string;
 }
 
+export interface UpdateCoachingSessionInput {
+  session_date: string;
+}
+
 export interface ApiResponse<T> {
   data: T;
 }

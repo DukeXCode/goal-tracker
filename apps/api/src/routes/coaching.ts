@@ -7,6 +7,7 @@ import type {
   CreateCoachingTopicInput,
   UpdateCoachingTopicInput,
   CompleteSessionInput,
+  UpdateCoachingSessionInput,
 } from "@goal-tracker/shared";
 
 export const coachingRoutes = new Hono<{ Bindings: Bindings }>();
@@ -211,6 +212,33 @@ coachingRoutes.post("/sessions/complete", async (c) => {
   };
 
   return c.json({ data }, 201);
+});
+
+coachingRoutes.put("/sessions/:id", async (c) => {
+  const id = c.req.param("id");
+  const body = await c.req.json<UpdateCoachingSessionInput>();
+
+  const existing = await c.env.DB.prepare(
+    "SELECT id FROM coaching_sessions WHERE id = ?"
+  )
+    .bind(id)
+    .first();
+
+  if (!existing) {
+    return c.json({ error: "Session not found" }, 404);
+  }
+
+  if (!body.session_date) {
+    return c.json({ error: "session_date is required" }, 400);
+  }
+
+  await c.env.DB.prepare(
+    "UPDATE coaching_sessions SET session_date = ? WHERE id = ?"
+  )
+    .bind(body.session_date, id)
+    .run();
+
+  return c.json({ data: { ...existing, session_date: body.session_date } });
 });
 
 coachingRoutes.delete("/sessions/:id", async (c) => {

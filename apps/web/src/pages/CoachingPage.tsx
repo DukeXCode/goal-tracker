@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useCoachingTopics } from "../hooks/useCoachingTopics";
 import { useCoachingSessions } from "../hooks/useCoachingSessions";
 
 function formatDate(iso: string) {
   const d = new Date(iso.includes("T") ? iso : iso.replace(" ", "T") + "Z");
   return d.toLocaleDateString("de-DE");
+}
+
+function isoToDisplay(iso: string) {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-");
+  return `${d}.${m}.${y}`;
+}
+
+function displayToISO(display: string) {
+  const match = display.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (!match) return "";
+  return `${match[3]}-${match[2]}-${match[1]}`;
 }
 
 export default function CoachingPage() {
@@ -22,6 +34,7 @@ export default function CoachingPage() {
     loading: sessionsLoading,
     error: sessionsError,
     completeSession,
+    updateSession,
     deleteSession,
   } = useCoachingSessions();
 
@@ -30,6 +43,28 @@ export default function CoachingPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [completing, setCompleting] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [editDateInput, setEditDateInput] = useState("");
+  const [editTargetDate, setEditTargetDate] = useState("");
+  const [savingDate, setSavingDate] = useState(false);
+  const editDatePickerRef = useRef<HTMLInputElement>(null);
+
+  const setEditDateFromISO = (iso: string) => {
+    setEditTargetDate(iso);
+    setEditDateInput(isoToDisplay(iso));
+  };
+
+  const handleSaveSessionDate = async () => {
+    if (!editingSessionId || !editTargetDate) return;
+    setSavingDate(true);
+    try {
+      await updateSession(editingSessionId, { session_date: editTargetDate });
+      setEditingSessionId(null);
+    } finally {
+      setSavingDate(false);
+    }
+  };
 
   const toggleSelect = (id: string) => {
     const next = new Set(selected);
@@ -85,8 +120,13 @@ export default function CoachingPage() {
     await refreshTopics();
   };
 
+  const editingSession = editingSessionId
+    ? sessions.find((s) => s.id === editingSessionId)
+    : null;
+
   return (
-    <div className="space-y-6 md:space-y-8">
+    <>
+      <div className="space-y-6 md:space-y-8">
       <h2 className="text-2xl font-bold text-text-primary">Coaching</h2>
 
       {/* Next Session */}
@@ -250,24 +290,54 @@ export default function CoachingPage() {
                       {session.topics.length === 1 ? "" : "s"}
                     </span>
                   </div>
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteSession(session.id);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
+                  <div className="flex items-center gap-3">
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const iso = session.session_date.includes("T")
+                          ? session.session_date.split("T")[0]
+                          : session.session_date.split(" ")[0];
+                        setEditTargetDate(iso);
+                        setEditDateInput(isoToDisplay(iso));
+                        setEditingSessionId(session.id);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const iso = session.session_date.includes("T")
+                            ? session.session_date.split("T")[0]
+                            : session.session_date.split(" ")[0];
+                          setEditTargetDate(iso);
+                          setEditDateInput(isoToDisplay(iso));
+                          setEditingSessionId(session.id);
+                        }
+                      }}
+                      className="text-xs text-text-tertiary hover:text-accent transition-colors cursor-pointer"
+                    >
+                      Edit
+                    </span>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteSession(session.id);
-                      }
-                    }}
-                    className="text-xs text-text-tertiary hover:text-danger transition-colors cursor-pointer"
-                  >
-                    Delete
-                  </span>
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDeleteSession(session.id);
+                        }
+                      }}
+                      className="text-xs text-text-tertiary hover:text-danger transition-colors cursor-pointer"
+                    >
+                      Delete
+                    </span>
+                  </div>
                 </button>
                 {isOpen && (
                   <div className="px-4 pb-4 pl-11 border-t border-border-primary pt-3">
@@ -300,5 +370,72 @@ export default function CoachingPage() {
         </div>
       </section>
     </div>
+
+      {editingSessionId && editingSession && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          onClick={() => setEditingSessionId(null)}
+        >
+          <div className="absolute inset-0 bg-black/50" />
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative bg-surface-secondary rounded-xl border border-border-primary p-6 w-full max-w-sm mx-4 shadow-xl"
+          >
+            <h3 className="text-lg font-semibold text-text-primary mb-4">
+              Edit Session Date
+            </h3>
+
+            <div className="relative mb-4">
+              <input
+                type="text"
+                value={editDateInput}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setEditDateInput(val);
+                  const iso = displayToISO(val);
+                  if (iso) setEditTargetDate(iso);
+                  else if (val === "") setEditTargetDate("");
+                }}
+                placeholder="dd.MM.yyyy"
+                className="w-full px-3 py-2.5 pr-9 border border-border-primary rounded-lg text-sm bg-surface-tertiary text-text-primary placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-colors"
+              />
+              <input
+                ref={editDatePickerRef}
+                type="date"
+                value={editTargetDate}
+                onChange={(e) => setEditDateFromISO(e.target.value)}
+                className="sr-only"
+                tabIndex={-1}
+              />
+              <button
+                type="button"
+                onClick={() => editDatePickerRef.current?.showPicker()}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 text-text-tertiary hover:text-text-secondary transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                  <path fillRule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setEditingSessionId(null)}
+                className="px-4 py-2.5 bg-surface-tertiary text-text-secondary text-sm font-medium rounded-lg hover:bg-surface-hover border border-border-primary transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveSessionDate}
+                disabled={savingDate || !editTargetDate}
+                className="px-4 py-2.5 bg-accent text-white text-sm font-semibold rounded-lg hover:bg-accent-hover disabled:opacity-50 transition-colors"
+              >
+                {savingDate ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

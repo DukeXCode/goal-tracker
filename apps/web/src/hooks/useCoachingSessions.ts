@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   CoachingSessionWithTopics,
   CompleteSessionInput,
+  UpdateCoachingSessionInput,
 } from "@goal-tracker/shared";
 import { api } from "../lib/api";
 
@@ -26,6 +27,12 @@ export function useCoachingSessions() {
     return res.data;
   };
 
+  const updateSession = async (id: string, input: UpdateCoachingSessionInput) => {
+    const res = await api.coaching.sessions.update(id, input);
+    await invalidate();
+    return res.data;
+  };
+
   const deleteSession = async (id: string) => {
     await api.coaching.sessions.delete(id);
     await invalidate();
@@ -36,6 +43,7 @@ export function useCoachingSessions() {
     loading: query.isLoading,
     error: query.error ? (query.error as Error).message : null,
     completeSession,
+    updateSession,
     deleteSession,
     refresh: () => query.refetch(),
   };
