@@ -107,7 +107,7 @@ All responses are wrapped in a standard envelope:
 
 | Name | Type | Required | Description | Default |
 |------|------|----------|-------------|---------|
-| `status` | `not_started | in_progress | completed` | No | Filter goals by status | — |
+| `status` | `not_started \| in_progress \| completed` | No | Filter goals by status | — |
 
 #### Example Response
 
@@ -167,8 +167,8 @@ All responses are wrapped in a standard envelope:
 |------|------|----------|-------------|---------|
 | `title` | `string` | Yes | Goal title | — |
 | `description` | `string` | No | Goal description | "" |
-| `status` | `not_started | in_progress | completed` | No | Goal status | "not_started" |
-| `target_date` | `string | null` | No | Target completion date (ISO 8601) | null |
+| `status` | `not_started \| in_progress \| completed` | No | Goal status | "not_started" |
+| `target_date` | `string \| null` | No | Target completion date (ISO 8601) | null |
 
 #### Example Request
 
@@ -211,8 +211,8 @@ All responses are wrapped in a standard envelope:
 |------|------|----------|-------------|---------|
 | `title` | `string` | No | Goal title | — |
 | `description` | `string` | No | Goal description | — |
-| `status` | `not_started | in_progress | completed` | No | Goal status | — |
-| `target_date` | `string | null` | No | Target completion date (ISO 8601) | — |
+| `status` | `not_started \| in_progress \| completed` | No | Goal status | — |
+| `target_date` | `string \| null` | No | Target completion date (ISO 8601) | — |
 
 #### Example Request
 
@@ -328,8 +328,8 @@ All responses are wrapped in a standard envelope:
 |------|------|----------|-------------|---------|
 | `title` | `string` | Yes | Entry title | — |
 | `content` | `string` | No | Entry content/body | "" |
-| `mood` | `great | good | okay | bad | terrible | null` | No | How you're feeling | null |
-| `goal_id` | `string | null` | No | Link to a goal | null |
+| `mood` | `great \| good \| okay \| bad \| terrible \| null` | No | How you're feeling | null |
+| `goal_id` | `string \| null` | No | Link to a goal | null |
 
 #### Example Request
 
@@ -373,8 +373,8 @@ All responses are wrapped in a standard envelope:
 |------|------|----------|-------------|---------|
 | `title` | `string` | No | Entry title | — |
 | `content` | `string` | No | Entry content/body | — |
-| `mood` | `great | good | okay | bad | terrible | null` | No | How you're feeling | — |
-| `goal_id` | `string | null` | No | Link to a goal | — |
+| `mood` | `great \| good \| okay \| bad \| terrible \| null` | No | How you're feeling | — |
+| `goal_id` | `string \| null` | No | Link to a goal | — |
 
 #### Example Request
 
@@ -430,7 +430,7 @@ All responses are wrapped in a standard envelope:
 
 | Name | Type | Required | Description | Default |
 |------|------|----------|-------------|---------|
-| `status` | `pending | discussed | all` | No | Filter by topic status | "pending" |
+| `status` | `pending \| discussed \| all` | No | Filter by topic status | "pending" |
 
 #### Example Response
 
@@ -715,8 +715,8 @@ A tracking goal with title, description, status, and optional target date.
 | `id` | `string` | Yes | UUID identifier | — |
 | `title` | `string` | Yes | Goal title | — |
 | `description` | `string` | Yes | Goal description | — |
-| `status` | `not_started | in_progress | completed` | Yes | Current status | — |
-| `target_date` | `string | null` | No | Target completion date | — |
+| `status` | `not_started \| in_progress \| completed` | Yes | Current status | — |
+| `target_date` | `string \| null` | No | Target completion date | — |
 | `created_at` | `string` | Yes | Creation timestamp (ISO 8601) | — |
 | `updated_at` | `string` | Yes | Last update timestamp (ISO 8601) | — |
 
@@ -729,8 +729,8 @@ A journal entry with optional mood and goal linkage.
 | `id` | `string` | Yes | UUID identifier | — |
 | `title` | `string` | Yes | Entry title | — |
 | `content` | `string` | Yes | Entry content/body | — |
-| `mood` | `great | good | okay | bad | terrible | null` | No | Mood rating | — |
-| `goal_id` | `string | null` | No | Linked goal ID | — |
+| `mood` | `great \| good \| okay \| bad \| terrible \| null` | No | Mood rating | — |
+| `goal_id` | `string \| null` | No | Linked goal ID | — |
 | `created_at` | `string` | Yes | Creation timestamp (ISO 8601) | — |
 | `updated_at` | `string` | Yes | Last update timestamp (ISO 8601) | — |
 
@@ -742,7 +742,7 @@ A coaching topic. Pending topics have `session_id: null`; discussed topics are l
 |------|------|----------|-------------|---------|
 | `id` | `string` | Yes | UUID identifier | — |
 | `title` | `string` | Yes | Topic title | — |
-| `session_id` | `string | null` | No | Linked session ID (null = pending) | — |
+| `session_id` | `string \| null` | No | Linked session ID (null = pending) | — |
 | `created_at` | `string` | Yes | Creation timestamp (ISO 8601) | — |
 | `updated_at` | `string` | Yes | Last update timestamp (ISO 8601) | — |
 

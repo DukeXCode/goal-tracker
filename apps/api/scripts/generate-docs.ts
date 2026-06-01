@@ -30,7 +30,7 @@ function fieldTable(fields: Field[]): string {
   const sep = "|------|------|----------|-------------|---------|";
   const rows = fields.map(
     (f) =>
-      `| \`${f.name}\` | \`${f.type}\` | ${f.required ? "Yes" : "No"} | ${f.description} | ${f.default ?? "—"} |`
+      `| \`${f.name}\` | \`${f.type.replace(/\|/g, "\\|")}\` | ${f.required ? "Yes" : "No"} | ${f.description} | ${f.default ?? "—"} |`
   );
   return [header, sep, ...rows].join("\n");
 }
