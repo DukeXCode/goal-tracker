@@ -7,8 +7,9 @@
     "docs": "bun run scripts/generate-docs.ts"
   },
   "dependencies": {
+    "@goal-tracker/shared": "workspace:*",
     "hono": "^4",
-    "@goal-tracker/shared": "workspace:*"
+    "mcp-lite": "^0.10.0"
   },
   "devDependencies": {
     "wrangler": "4",

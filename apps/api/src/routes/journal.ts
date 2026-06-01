@@ -5,34 +5,22 @@ import type {
   UpdateJournalEntryInput,
   JournalEntry,
 } from "@goal-tracker/shared";
+import {
+  QueryError,
+  listJournalEntries,
+  getJournalEntry,
+  createJournalEntry,
+} from "../db/queries";
 
 export const journalRoutes = new Hono<{ Bindings: Bindings }>();
 
 journalRoutes.get("/", async (c) => {
-  const goalId = c.req.query("goal_id");
-  let query = "SELECT * FROM journal_entries";
-  const params: string[] = [];
-
-  if (goalId) {
-    query += " WHERE goal_id = ?";
-    params.push(goalId);
-  }
-
-  query += " ORDER BY created_at DESC";
-
-  const result = await c.env.DB.prepare(query)
-    .bind(...params)
-    .all<JournalEntry>();
-  return c.json({ data: result.results });
+  const data = await listJournalEntries(c.env.DB, c.req.query("goal_id"));
+  return c.json({ data });
 });
 
 journalRoutes.get("/:id", async (c) => {
-  const id = c.req.param("id");
-  const result = await c.env.DB.prepare(
-    "SELECT * FROM journal_entries WHERE id = ?"
-  )
-    .bind(id)
-    .first<JournalEntry>();
+  const result = await getJournalEntry(c.env.DB, c.req.param("id"));
 
   if (!result) {
     return c.json({ error: "Journal entry not found" }, 404);
@@ -44,44 +32,15 @@ journalRoutes.get("/:id", async (c) => {
 journalRoutes.post("/", async (c) => {
   const body = await c.req.json<CreateJournalEntryInput>();
 
-  if (!body.title?.trim()) {
-    return c.json({ error: "Title is required" }, 400);
-  }
-
-  if (body.goal_id) {
-    const goal = await c.env.DB.prepare("SELECT id FROM goals WHERE id = ?")
-      .bind(body.goal_id)
-      .first();
-    if (!goal) {
-      return c.json({ error: "Referenced goal not found" }, 400);
+  try {
+    const created = await createJournalEntry(c.env.DB, body);
+    return c.json({ data: created }, 201);
+  } catch (e) {
+    if (e instanceof QueryError) {
+      return c.json({ error: e.message }, e.status);
     }
+    throw e;
   }
-
-  const id = crypto.randomUUID();
-  const now = new Date().toISOString();
-
-  await c.env.DB.prepare(
-    `INSERT INTO journal_entries (id, title, content, mood, goal_id, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`
-  )
-    .bind(
-      id,
-      body.title.trim(),
-      body.content?.trim() ?? "",
-      body.mood ?? null,
-      body.goal_id ?? null,
-      now,
-      now
-    )
-    .run();
-
-  const created = await c.env.DB.prepare(
-    "SELECT * FROM journal_entries WHERE id = ?"
-  )
-    .bind(id)
-    .first<JournalEntry>();
-
-  return c.json({ data: created }, 201);
 });
 
 journalRoutes.put("/:id", async (c) => {

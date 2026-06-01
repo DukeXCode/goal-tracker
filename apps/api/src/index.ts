@@ -1,10 +1,12 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { StreamableHttpTransport } from "mcp-lite";
 import { goalRoutes } from "./routes/goals";
 import { journalRoutes } from "./routes/journal";
 import { coachingRoutes } from "./routes/coaching";
 import { authRoutes } from "./routes/auth";
 import { authMiddleware } from "./middleware/auth";
+import { createMcpServer } from "./mcp/server";
 
 export type Bindings = {
   DB: D1Database;
@@ -16,7 +18,7 @@ export type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>();
 
 app.use(
-  "/api/*",
+  "*",
   cors({
     origin: (origin) => origin,
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -25,6 +27,16 @@ app.use(
 );
 
 app.get("/api/health", (c) => c.json({ status: "ok" }));
+
+// MCP server (Streamable HTTP), authenticated with the same JWT bearer token
+// as the REST API. The server is built per request so its tool handlers close
+// over this request's DB binding (the transport is stateless on Workers).
+app.use("/mcp", authMiddleware);
+app.all("/mcp", async (c) => {
+  const transport = new StreamableHttpTransport();
+  const handler = transport.bind(createMcpServer(c.env.DB));
+  return handler(c.req.raw);
+});
 
 app.route("/api/auth", authRoutes);
 
