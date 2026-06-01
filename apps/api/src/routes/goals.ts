@@ -1,30 +1,17 @@
 import { Hono } from "hono";
 import type { Bindings } from "../index";
 import type { CreateGoalInput, UpdateGoalInput, Goal } from "@goal-tracker/shared";
+import { QueryError, listGoals, getGoal, createGoal } from "../db/queries";
 
 export const goalRoutes = new Hono<{ Bindings: Bindings }>();
 
 goalRoutes.get("/", async (c) => {
-  const status = c.req.query("status");
-  let query = "SELECT * FROM goals";
-  const params: string[] = [];
-
-  if (status) {
-    query += " WHERE status = ?";
-    params.push(status);
-  }
-
-  query += " ORDER BY created_at DESC";
-
-  const result = await c.env.DB.prepare(query).bind(...params).all<Goal>();
-  return c.json({ data: result.results });
+  const data = await listGoals(c.env.DB, c.req.query("status"));
+  return c.json({ data });
 });
 
 goalRoutes.get("/:id", async (c) => {
-  const id = c.req.param("id");
-  const result = await c.env.DB.prepare("SELECT * FROM goals WHERE id = ?")
-    .bind(id)
-    .first<Goal>();
+  const result = await getGoal(c.env.DB, c.req.param("id"));
 
   if (!result) {
     return c.json({ error: "Goal not found" }, 404);
@@ -36,33 +23,15 @@ goalRoutes.get("/:id", async (c) => {
 goalRoutes.post("/", async (c) => {
   const body = await c.req.json<CreateGoalInput>();
 
-  if (!body.title?.trim()) {
-    return c.json({ error: "Title is required" }, 400);
+  try {
+    const created = await createGoal(c.env.DB, body);
+    return c.json({ data: created }, 201);
+  } catch (e) {
+    if (e instanceof QueryError) {
+      return c.json({ error: e.message }, e.status);
+    }
+    throw e;
   }
-
-  const id = crypto.randomUUID();
-  const now = new Date().toISOString();
-
-  await c.env.DB.prepare(
-    `INSERT INTO goals (id, title, description, status, target_date, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`
-  )
-    .bind(
-      id,
-      body.title.trim(),
-      body.description?.trim() ?? "",
-      body.status ?? "not_started",
-      body.target_date ?? null,
-      now,
-      now
-    )
-    .run();
-
-  const created = await c.env.DB.prepare("SELECT * FROM goals WHERE id = ?")
-    .bind(id)
-    .first<Goal>();
-
-  return c.json({ data: created }, 201);
 });
 
 goalRoutes.put("/:id", async (c) => {
