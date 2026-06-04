@@ -7,6 +7,7 @@ import GoalDetailPage from "./pages/GoalDetailPage";
 import JournalPage from "./pages/JournalPage";
 import JournalEntryPage from "./pages/JournalEntryPage";
 import CoachingPage from "./pages/CoachingPage";
+import AchievementsPage from "./pages/AchievementsPage";
 import LoginPage from "./pages/LoginPage";
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/journal" element={<JournalPage />} />
         <Route path="/journal/:id" element={<JournalEntryPage />} />
         <Route path="/coaching" element={<CoachingPage />} />
+        <Route path="/achievements" element={<AchievementsPage />} />
       </Route>
     </Routes>
   );
