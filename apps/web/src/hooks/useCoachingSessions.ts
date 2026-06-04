@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   CoachingSessionWithTopics,
@@ -9,6 +10,7 @@ import { api } from "../lib/api";
 export function useCoachingSessions() {
   const qc = useQueryClient();
   const key = ["coaching-sessions"];
+  const [xpToast, setXpToast] = useState<number | null>(null);
 
   const query = useQuery({
     queryKey: key,
@@ -24,6 +26,9 @@ export function useCoachingSessions() {
   const completeSession = async (input: CompleteSessionInput) => {
     const res = await api.coaching.sessions.complete(input);
     await invalidate();
+    if (res.data.gamification) {
+      setXpToast(res.data.gamification.xp_awarded);
+    }
     return res.data;
   };
 
@@ -46,5 +51,7 @@ export function useCoachingSessions() {
     updateSession,
     deleteSession,
     refresh: () => query.refetch(),
+    xpToast,
+    clearXpToast: () => setXpToast(null),
   };
 }

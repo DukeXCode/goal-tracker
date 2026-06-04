@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Goal, GoalStatus, CreateGoalInput, UpdateGoalInput } from "@goal-tracker/shared";
 import { api } from "../lib/api";
@@ -5,6 +6,7 @@ import { api } from "../lib/api";
 export function useGoals(statusFilter?: GoalStatus) {
   const qc = useQueryClient();
   const key = ["goals", statusFilter ?? "all"];
+  const [xpToast, setXpToast] = useState<number | null>(null);
 
   const query = useQuery({
     queryKey: key,
@@ -23,6 +25,9 @@ export function useGoals(statusFilter?: GoalStatus) {
   const updateGoal = async (id: string, input: UpdateGoalInput) => {
     const res = await api.goals.update(id, input);
     await invalidate();
+    if (res.data.gamification) {
+      setXpToast(res.data.gamification.xp_awarded);
+    }
     return res.data;
   };
 
@@ -39,5 +44,7 @@ export function useGoals(statusFilter?: GoalStatus) {
     updateGoal,
     deleteGoal,
     refresh: () => query.refetch(),
+    xpToast,
+    clearXpToast: () => setXpToast(null),
   };
 }
