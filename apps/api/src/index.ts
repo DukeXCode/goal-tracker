@@ -4,6 +4,7 @@ import { goalRoutes } from "./routes/goals";
 import { journalRoutes } from "./routes/journal";
 import { coachingRoutes } from "./routes/coaching";
 import { authRoutes } from "./routes/auth";
+import { gamificationRoutes } from "./routes/gamification";
 import { authMiddleware } from "./middleware/auth";
 
 export type Bindings = {
@@ -31,9 +32,11 @@ app.route("/api/auth", authRoutes);
 app.use("/api/goals/*", authMiddleware);
 app.use("/api/journal/*", authMiddleware);
 app.use("/api/coaching/*", authMiddleware);
+app.use("/api/gamification/*", authMiddleware);
 
 app.route("/api/goals", goalRoutes);
 app.route("/api/journal", journalRoutes);
 app.route("/api/coaching", coachingRoutes);
+app.route("/api/gamification", gamificationRoutes);
 
 export default app;
