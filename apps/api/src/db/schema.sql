@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS goals (
   status TEXT NOT NULL DEFAULT 'not_started'
     CHECK (status IN ('not_started', 'in_progress', 'completed')),
   target_date TEXT,
+  xp_awarded INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
