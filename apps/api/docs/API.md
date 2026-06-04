@@ -704,6 +704,106 @@ All responses are wrapped in a standard envelope:
 
 ---
 
+## Gamification
+
+### **`GET`** `/api/gamification/stats`
+
+**Get Gamification Stats** — Returns the user's current XP, level, and progress toward the next level.
+
+- **Auth:** Required (JWT)
+- **Status Code:** `200`
+
+#### Example Response
+
+```json
+{
+  "data": {
+    "user_stats": {
+      "id": "single_user",
+      "xp": 350,
+      "level": 2,
+      "updated_at": "2026-06-04T10:00:00.000Z"
+    },
+    "xp_to_next_level": 200,
+    "xp_in_current_level": 150
+  }
+}
+```
+
+---
+
+### **`GET`** `/api/gamification/achievements`
+
+**Get Achievements** — Returns all achievements, sorted by earned status (earned first, then unearned).
+
+- **Auth:** Required (JWT)
+- **Status Code:** `200`
+
+#### Example Response
+
+```json
+{
+  "data": [
+    {
+      "id": "a1b2c3d4-...",
+      "achievement_key": "first_step",
+      "title": "First Step",
+      "description": "Complete your first goal",
+      "icon": "footprint",
+      "earned_at": "2026-06-04T10:00:00.000Z",
+      "created_at": "2026-06-04T00:00:00.000Z"
+    },
+    {
+      "id": "b2c3d4e5-...",
+      "achievement_key": "level_10",
+      "title": "Level 10",
+      "description": "Reach level 10",
+      "icon": "crown",
+      "earned_at": null,
+      "created_at": "2026-06-04T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+### XP Awards
+
+When gamification-triggering actions occur, the response includes a `gamification` object with XP details.
+
+| Action | XP Awarded | Trigger
+|--------|------------|----------|
+| Create a goal | 10 XP | `POST /api/goals` |
+| Move goal to in_progress | 10 XP | `PUT /api/goals/:id` (status change from not_started) |
+| Complete a goal | 50 XP | `PUT /api/goals/:id` (status change to completed) |
+| Write a journal entry | 20 XP | `POST /api/journal` |
+| Complete a coaching session | 20 XP | `POST /api/coaching/sessions/complete` |
+
+**Note:** XP is only awarded once per goal per action type (tracked via `xp_awarded` bitmask). Re-completing a goal does not award additional XP.
+
+#### Gamification Response Object
+
+```json
+{
+  "gamification": {
+    "xp_awarded": 50,
+    "total_xp": 400,
+    "new_level": 3,
+    "achievements_unlocked": []
+  }
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `xp_awarded` | `number` | XP earned in this action |
+| `total_xp` | `number` | User's total XP after this action |
+| `new_level` | `number \| null` | New level if leveled up, null otherwise |
+| `achievements_unlocked` | `Achievement[]` | Any achievements unlocked by this action |
+
+---
+
 ## Data Schemas
 
 ### Goal
@@ -717,6 +817,7 @@ A tracking goal with title, description, status, and optional target date.
 | `description` | `string` | Yes | Goal description | — |
 | `status` | `not_started \| in_progress \| completed` | Yes | Current status | — |
 | `target_date` | `string \| null` | No | Target completion date | — |
+| `xp_awarded` | `number` | Yes | Bitmask tracking awarded XP (bit 0 = in_progress, bit 1 = completed) | — |
 | `created_at` | `string` | Yes | Creation timestamp (ISO 8601) | — |
 | `updated_at` | `string` | Yes | Last update timestamp (ISO 8601) | — |
 
