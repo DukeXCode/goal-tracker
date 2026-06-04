@@ -9,6 +9,7 @@ import type {
   CompleteSessionInput,
   UpdateCoachingSessionInput,
 } from "@goal-tracker/shared";
+import { awardXp } from "../lib/gamification";
 
 export const coachingRoutes = new Hono<{ Bindings: Bindings }>();
 
@@ -211,7 +212,12 @@ coachingRoutes.post("/sessions/complete", async (c) => {
     topics: topics.results,
   };
 
-  return c.json({ data }, 201);
+  // Award XP for coaching session
+  const gamificationResult = await awardXp(c.env.DB, 20);
+
+  return c.json({
+    data: { ...data, gamification: gamificationResult },
+  }, 201);
 });
 
 coachingRoutes.put("/sessions/:id", async (c) => {
