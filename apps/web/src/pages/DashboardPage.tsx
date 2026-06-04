@@ -3,6 +3,9 @@ import { useGoals } from "../hooks/useGoals";
 import { useJournalEntries } from "../hooks/useJournalEntries";
 import { useCoachingTopics } from "../hooks/useCoachingTopics";
 import { useCoachingSessions } from "../hooks/useCoachingSessions";
+import { useGamification } from "../hooks/useGamification";
+import LevelBadge from "../components/LevelBadge";
+import LevelProgressBar from "../components/LevelProgressBar";
 
 function formatDate(iso: string) {
   const d = new Date(iso.includes("T") ? iso : iso.replace(" ", "T") + "Z");
@@ -53,6 +56,8 @@ export default function DashboardPage() {
   const { topics: pendingTopics, loading: topicsLoading } = useCoachingTopics("pending");
   const { sessions, loading: sessionsLoading } = useCoachingSessions();
 
+  const { stats, statsLoading } = useGamification();
+
   const loading = goalsLoading || entriesLoading || topicsLoading || sessionsLoading;
 
   if (loading) {
@@ -81,6 +86,35 @@ export default function DashboardPage() {
         <h2 className="text-2xl font-bold text-text-primary">Dashboard</h2>
         <p className="text-sm text-text-tertiary mt-1">Your goals, journal, and coaching at a glance.</p>
       </div>
+
+      {/* Gamification Stats */}
+      {!statsLoading && stats && (
+        <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 md:p-5">
+          <div className="flex items-center gap-3 mb-3">
+            <LevelBadge level={stats.user_stats.level} size="md" />
+            <div className="flex-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-lg font-bold text-text-primary">
+                  Level {stats.user_stats.level}
+                </span>
+                <span className="text-sm text-text-tertiary">
+                  {stats.user_stats.xp} total XP
+                </span>
+              </div>
+            </div>
+            <Link
+              to="/achievements"
+              className="text-xs text-accent hover:text-accent-hover transition-colors"
+            >
+              Achievements
+            </Link>
+          </div>
+          <LevelProgressBar
+            currentXp={stats.xp_in_current_level}
+            nextLevelXp={stats.xp_to_next_level}
+          />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Last Journal Entry */}
