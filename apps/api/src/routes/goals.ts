@@ -63,7 +63,12 @@ goalRoutes.post("/", async (c) => {
     .bind(id)
     .first<Goal>();
 
-  return c.json({ data: created }, 201);
+  // Award XP for creating a goal
+  const gamificationResult = await awardXp(c.env.DB, 10);
+
+  return c.json({
+    data: { ...created, gamification: gamificationResult },
+  }, 201);
 });
 
 goalRoutes.put("/:id", async (c) => {

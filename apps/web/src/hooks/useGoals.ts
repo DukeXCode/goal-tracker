@@ -20,6 +20,10 @@ export function useGoals(statusFilter?: GoalStatus) {
   const createGoal = async (input: CreateGoalInput) => {
     const res = await api.goals.create(input);
     await invalidate();
+    if (res.data.gamification) {
+      setXpToast(res.data.gamification.xp_awarded);
+      await invalidateGamification();
+    }
     return res.data;
   };
 

@@ -48,7 +48,7 @@ export const api = {
       request<{ data: Goal[] }>(`/goals${status ? `?status=${status}` : ""}`),
     get: (id: string) => request<{ data: Goal }>(`/goals/${id}`),
     create: (input: CreateGoalInput) =>
-      request<{ data: Goal }>("/goals", {
+      request<{ data: Goal & { gamification?: GamificationAction } }>("/goals", {
         method: "POST",
         body: JSON.stringify(input),
       }),
