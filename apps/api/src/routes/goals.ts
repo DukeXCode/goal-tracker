@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import type { Bindings } from "../index";
 import type { CreateGoalInput, UpdateGoalInput, Goal } from "@goal-tracker/shared";
+import { awardXp } from "../lib/gamification";
 
 export const goalRoutes = new Hono<{ Bindings: Bindings }>();
 
@@ -83,6 +84,16 @@ goalRoutes.put("/:id", async (c) => {
   const target_date = body.target_date !== undefined ? body.target_date : existing.target_date;
   const now = new Date().toISOString();
 
+  // Award XP for status changes
+  let gamificationResult = null;
+  if (body.status && body.status !== existing.status) {
+    if (body.status === "in_progress" && existing.status === "not_started") {
+      gamificationResult = await awardXp(c.env.DB, 10);
+    } else if (body.status === "completed" && existing.status !== "completed") {
+      gamificationResult = await awardXp(c.env.DB, 50);
+    }
+  }
+
   await c.env.DB.prepare(
     `UPDATE goals SET title = ?, description = ?, status = ?, target_date = ?, updated_at = ?
      WHERE id = ?`
@@ -94,7 +105,11 @@ goalRoutes.put("/:id", async (c) => {
     .bind(id)
     .first<Goal>();
 
-  return c.json({ data: updated });
+  return c.json({
+    data: gamificationResult
+      ? { ...updated, gamification: gamificationResult }
+      : updated,
+  });
 });
 
 goalRoutes.delete("/:id", async (c) => {
