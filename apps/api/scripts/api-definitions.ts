@@ -597,9 +597,69 @@ export const endpoints: Endpoint[] = [
       response: "(no content)",
     },
   },
+
+  // ── Gamification ───────────────────────────────────────
+  {
+    method: "GET",
+    path: "/api/gamification/stats",
+    title: "Get Gamification Stats",
+    description: "Returns the user's current XP, level, and progress toward the next level.",
+    auth: true,
+    group: "Gamification",
+    responseType: "object",
+    statusCode: 200,
+    example: {
+      response: `{
+  "data": {
+    "user_stats": {
+      "id": "single_user",
+      "xp": 350,
+      "level": 2,
+      "updated_at": "2026-06-04T10:00:00.000Z"
+    },
+    "xp_to_next_level": 200,
+    "xp_in_current_level": 150
+  }
+}`,
+    },
+  },
+  {
+    method: "GET",
+    path: "/api/gamification/achievements",
+    title: "Get Achievements",
+    description: "Returns all achievements, sorted by earned status (earned first, then unearned).",
+    auth: true,
+    group: "Gamification",
+    responseType: "array",
+    statusCode: 200,
+    example: {
+      response: `{
+  "data": [
+    {
+      "id": "a1b2c3d4-...",
+      "achievement_key": "first_step",
+      "title": "First Step",
+      "description": "Complete your first goal",
+      "icon": "footprint",
+      "earned_at": "2026-06-04T10:00:00.000Z",
+      "created_at": "2026-06-04T00:00:00.000Z"
+    },
+    {
+      "id": "b2c3d4e5-...",
+      "achievement_key": "level_10",
+      "title": "Level 10",
+      "description": "Reach level 10",
+      "icon": "crown",
+      "earned_at": null,
+      "created_at": "2026-06-04T00:00:00.000Z"
+    }
+  ]
+}`,
+    },
+  },
 ];
 
-export const groups = ["Health", "Auth", "Goals", "Journal", "Coaching"];
+export const groups = ["Health", "Auth", "Goals", "Journal", "Coaching", "Gamification"];
 
 export const schemas: Record<string, { description: string; fields: Field[] }> = {
   Goal: {
@@ -610,6 +670,7 @@ export const schemas: Record<string, { description: string; fields: Field[] }> =
       { name: "description", type: "string", required: true, description: "Goal description" },
       { name: "status", type: "not_started | in_progress | completed", required: true, description: "Current status" },
       { name: "target_date", type: "string | null", required: false, description: "Target completion date" },
+      { name: "xp_awarded", type: "number", required: true, description: "Bitmask tracking awarded XP (bit 0 = in_progress, bit 1 = completed)" },
       { name: "created_at", type: "string", required: true, description: "Creation timestamp (ISO 8601)" },
       { name: "updated_at", type: "string", required: true, description: "Last update timestamp (ISO 8601)" },
     ],
@@ -643,6 +704,26 @@ export const schemas: Record<string, { description: string; fields: Field[] }> =
       { name: "session_date", type: "string", required: true, description: "Session date (ISO 8601)" },
       { name: "created_at", type: "string", required: true, description: "Creation timestamp (ISO 8601)" },
       { name: "topics", type: "CoachingTopic[]", required: true, description: "Topics discussed in this session" },
+    ],
+  },
+  GamificationStats: {
+    description: "User gamification stats with XP, level, and progress.",
+    fields: [
+      { name: "user_stats", type: "object", required: true, description: "User stats (id, xp, level, updated_at)" },
+      { name: "xp_to_next_level", type: "number", required: true, description: "XP needed to reach next level" },
+      { name: "xp_in_current_level", type: "number", required: true, description: "XP earned in current level" },
+    ],
+  },
+  Achievement: {
+    description: "An achievement that can be earned by completing milestones.",
+    fields: [
+      { name: "id", type: "string", required: true, description: "UUID identifier" },
+      { name: "achievement_key", type: "string", required: true, description: "Unique achievement identifier" },
+      { name: "title", type: "string", required: true, description: "Achievement title" },
+      { name: "description", type: "string", required: true, description: "Achievement description" },
+      { name: "icon", type: "string", required: true, description: "Icon identifier" },
+      { name: "earned_at", type: "string | null", required: false, description: "When the achievement was earned (null if locked)" },
+      { name: "created_at", type: "string", required: true, description: "Creation timestamp (ISO 8601)" },
     ],
   },
 };

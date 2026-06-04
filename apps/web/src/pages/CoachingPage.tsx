@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useCoachingTopics } from "../hooks/useCoachingTopics";
 import { useCoachingSessions } from "../hooks/useCoachingSessions";
+import XpToast from "../components/XpToast";
 
 function formatDate(iso: string) {
   const d = new Date(iso.includes("T") ? iso : iso.replace(" ", "T") + "Z");
@@ -36,6 +37,8 @@ export default function CoachingPage() {
     completeSession,
     updateSession,
     deleteSession,
+    xpToast,
+    clearXpToast,
   } = useCoachingSessions();
 
   const [newTitle, setNewTitle] = useState("");
@@ -436,6 +439,8 @@ export default function CoachingPage() {
           </div>
         </div>
       )}
+
+      {xpToast && <XpToast amount={xpToast} onDone={clearXpToast} />}
     </>
   );
 }

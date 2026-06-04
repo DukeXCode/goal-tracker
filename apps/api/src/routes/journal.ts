@@ -5,6 +5,7 @@ import type {
   UpdateJournalEntryInput,
   JournalEntry,
 } from "@goal-tracker/shared";
+import { awardXp } from "../lib/gamification";
 
 export const journalRoutes = new Hono<{ Bindings: Bindings }>();
 
@@ -81,7 +82,12 @@ journalRoutes.post("/", async (c) => {
     .bind(id)
     .first<JournalEntry>();
 
-  return c.json({ data: created }, 201);
+  // Award XP for journal entry
+  const gamificationResult = await awardXp(c.env.DB, 20);
+
+  return c.json({
+    data: { ...created, gamification: gamificationResult },
+  }, 201);
 });
 
 journalRoutes.put("/:id", async (c) => {

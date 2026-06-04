@@ -1,0 +1,34 @@
+-- 005_backfill_xp.sql
+-- Retroactive XP calculation for existing data
+-- This is a one-time migration to award XP for pre-gamification activity
+--
+-- NOTE: Run this manually after deployment if you want to backfill XP
+-- for goals, journal entries, and coaching sessions created before gamification.
+--
+-- The calculation:
+-- - Each completed goal: 50 XP
+-- - Each goal moved to in_progress: 10 XP (estimated from current in_progress goals)
+-- - Each journal entry: 20 XP
+-- - Each coaching session: 20 XP
+--
+-- Uncomment and run manually:
+--
+-- INSERT INTO user_stats (id, xp, level, updated_at)
+-- SELECT
+--   'single_user',
+--   (
+--     (SELECT COUNT(CASE WHEN status = 'completed' THEN 1 END) * 50 FROM goals) +
+--     (SELECT COUNT(CASE WHEN status = 'in_progress' THEN 1 END) * 10 FROM goals) +
+--     (SELECT COUNT(*) * 20 FROM journal_entries) +
+--     (SELECT COUNT(*) * 20 FROM coaching_sessions)
+--   ),
+--   1,
+--   datetime('now')
+-- ON CONFLICT(id) DO UPDATE SET
+--   xp = (
+--     (SELECT COUNT(CASE WHEN status = 'completed' THEN 1 END) * 50 FROM goals) +
+--     (SELECT COUNT(CASE WHEN status = 'in_progress' THEN 1 END) * 10 FROM goals) +
+--     (SELECT COUNT(*) * 20 FROM journal_entries) +
+--     (SELECT COUNT(*) * 20 FROM coaching_sessions)
+--   ),
+--   updated_at = datetime('now');

@@ -704,6 +704,70 @@ All responses are wrapped in a standard envelope:
 
 ---
 
+## Gamification
+
+### **`GET`** `/api/gamification/stats`
+
+**Get Gamification Stats** — Returns the user's current XP, level, and progress toward the next level.
+
+- **Auth:** Required (JWT)
+- **Status Code:** `200`
+
+#### Example Response
+
+```json
+{
+  "data": {
+    "user_stats": {
+      "id": "single_user",
+      "xp": 350,
+      "level": 2,
+      "updated_at": "2026-06-04T10:00:00.000Z"
+    },
+    "xp_to_next_level": 200,
+    "xp_in_current_level": 150
+  }
+}
+```
+
+---
+
+### **`GET`** `/api/gamification/achievements`
+
+**Get Achievements** — Returns all achievements, sorted by earned status (earned first, then unearned).
+
+- **Auth:** Required (JWT)
+- **Status Code:** `200`
+
+#### Example Response
+
+```json
+{
+  "data": [
+    {
+      "id": "a1b2c3d4-...",
+      "achievement_key": "first_step",
+      "title": "First Step",
+      "description": "Complete your first goal",
+      "icon": "footprint",
+      "earned_at": "2026-06-04T10:00:00.000Z",
+      "created_at": "2026-06-04T00:00:00.000Z"
+    },
+    {
+      "id": "b2c3d4e5-...",
+      "achievement_key": "level_10",
+      "title": "Level 10",
+      "description": "Reach level 10",
+      "icon": "crown",
+      "earned_at": null,
+      "created_at": "2026-06-04T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
 ## Data Schemas
 
 ### Goal
@@ -717,6 +781,7 @@ A tracking goal with title, description, status, and optional target date.
 | `description` | `string` | Yes | Goal description | — |
 | `status` | `not_started \| in_progress \| completed` | Yes | Current status | — |
 | `target_date` | `string \| null` | No | Target completion date | — |
+| `xp_awarded` | `number` | Yes | Bitmask tracking awarded XP (bit 0 = in_progress, bit 1 = completed) | — |
 | `created_at` | `string` | Yes | Creation timestamp (ISO 8601) | — |
 | `updated_at` | `string` | Yes | Last update timestamp (ISO 8601) | — |
 
@@ -756,3 +821,27 @@ A coaching session containing discussed topics.
 | `session_date` | `string` | Yes | Session date (ISO 8601) | — |
 | `created_at` | `string` | Yes | Creation timestamp (ISO 8601) | — |
 | `topics` | `CoachingTopic[]` | Yes | Topics discussed in this session | — |
+
+### GamificationStats
+
+User gamification stats with XP, level, and progress.
+
+| Name | Type | Required | Description | Default |
+|------|------|----------|-------------|---------|
+| `user_stats` | `object` | Yes | User stats (id, xp, level, updated_at) | — |
+| `xp_to_next_level` | `number` | Yes | XP needed to reach next level | — |
+| `xp_in_current_level` | `number` | Yes | XP earned in current level | — |
+
+### Achievement
+
+An achievement that can be earned by completing milestones.
+
+| Name | Type | Required | Description | Default |
+|------|------|----------|-------------|---------|
+| `id` | `string` | Yes | UUID identifier | — |
+| `achievement_key` | `string` | Yes | Unique achievement identifier | — |
+| `title` | `string` | Yes | Achievement title | — |
+| `description` | `string` | Yes | Achievement description | — |
+| `icon` | `string` | Yes | Icon identifier | — |
+| `earned_at` | `string \| null` | No | When the achievement was earned (null if locked) | — |
+| `created_at` | `string` | Yes | Creation timestamp (ISO 8601) | — |

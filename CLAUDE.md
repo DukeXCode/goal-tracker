@@ -26,12 +26,24 @@ Bun monorepo with three workspaces:
 
 ## Data Model
 
-Current schema in `apps/api//apps/api/src/db/schema.sql`
+Current schema in `apps/api/src/db/schema.sql`
+
+Tables: `goals`, `journal_entries`, `coaching_sessions`, `coaching_topics`, `user_stats`, `achievements`
 
 ## API Routes
 
 All routes are prefixed with `/api`:
+- `/api/auth` — Login, current user
+- `/api/goals` — Goal CRUD (awards XP on create, status changes)
+- `/api/journal` — Journal entry CRUD (awards XP on create)
+- `/api/coaching` — Coaching topics and sessions (awards XP on session complete)
+- `/api/gamification` — Stats and achievements
+
 Responses wrap data in `{ data: ... }` (or `{ error: ... }` on failure).
+
+### Gamification
+
+XP is awarded server-side for actions. Goals track awarded XP via bitmask to prevent duplicates.
 
 ## Frontend Patterns
 

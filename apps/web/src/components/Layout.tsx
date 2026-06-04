@@ -2,6 +2,8 @@ import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
+import { useGamification } from "../hooks/useGamification";
+import LevelBadge from "./LevelBadge";
 
 const navItems = [
   {
@@ -47,6 +49,7 @@ export default function Layout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { stats } = useGamification();
 
   const handleLogout = () => {
     logout();
@@ -125,6 +128,14 @@ export default function Layout() {
           ))}
         </nav>
         <div className="p-3 border-t border-border-primary">
+          {stats && (
+            <div className="flex items-center gap-2 px-3 py-2 mb-2">
+              <LevelBadge level={stats.user_stats.level} />
+              <span className="text-sm text-text-secondary">
+                Level {stats.user_stats.level}
+              </span>
+            </div>
+          )}
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"

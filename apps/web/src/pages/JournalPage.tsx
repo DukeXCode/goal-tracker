@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useJournalEntries } from "../hooks/useJournalEntries";
 import JournalEntryCard from "../components/JournalEntryCard";
 import JournalEntryForm from "../components/JournalEntryForm";
+import XpToast from "../components/XpToast";
 
 export default function JournalPage() {
   const [showForm, setShowForm] = useState(false);
-  const { entries, loading, error, createEntry, deleteEntry } =
+  const { entries, loading, error, createEntry, deleteEntry, xpToast, clearXpToast } =
     useJournalEntries();
 
   return (
@@ -62,6 +63,8 @@ export default function JournalPage() {
           />
         ))}
       </div>
+
+      {xpToast && <XpToast amount={xpToast} onDone={clearXpToast} />}
     </div>
   );
 }

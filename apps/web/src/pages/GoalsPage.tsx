@@ -4,6 +4,7 @@ import { useGoals } from "../hooks/useGoals";
 import { useLocalStorageState } from "../hooks/useLocalStorageState";
 import GoalCard from "../components/GoalCard";
 import GoalForm from "../components/GoalForm";
+import XpToast from "../components/XpToast";
 
 const statusFilters: { label: string; value: GoalStatus | undefined }[] = [
   { label: "All", value: undefined },
@@ -22,7 +23,7 @@ export default function GoalsPage() {
     null,
   );
   const [showForm, setShowForm] = useState(false);
-  const { goals, loading, error, createGoal, updateGoal, deleteGoal } = useGoals(statusFilter);
+  const { goals, loading, error, createGoal, updateGoal, deleteGoal, xpToast, clearXpToast } = useGoals(statusFilter);
 
   const filteredGoals = useMemo(() => {
     if (!dateFilter) return goals;
@@ -127,6 +128,8 @@ export default function GoalsPage() {
           />
         ))}
       </div>
+
+      {xpToast && <XpToast amount={xpToast} onDone={clearXpToast} />}
     </div>
   );
 }
