@@ -12,6 +12,9 @@ import type {
   UpdateCoachingTopicInput,
   CompleteSessionInput,
   UpdateCoachingSessionInput,
+  GamificationStats,
+  GamificationAction,
+  Achievement,
 } from "@goal-tracker/shared";
 import { getStoredToken } from "../context/AuthContext";
 
@@ -50,7 +53,7 @@ export const api = {
         body: JSON.stringify(input),
       }),
     update: (id: string, input: UpdateGoalInput) =>
-      request<{ data: Goal }>(`/goals/${id}`, {
+      request<{ data: Goal & { gamification?: GamificationAction } }>(`/goals/${id}`, {
         method: "PUT",
         body: JSON.stringify(input),
       }),
@@ -64,7 +67,7 @@ export const api = {
       ),
     get: (id: string) => request<{ data: JournalEntry }>(`/journal/${id}`),
     create: (input: CreateJournalEntryInput) =>
-      request<{ data: JournalEntry }>("/journal", {
+      request<{ data: JournalEntry & { gamification?: GamificationAction } }>("/journal", {
         method: "POST",
         body: JSON.stringify(input),
       }),
@@ -103,7 +106,7 @@ export const api = {
           `/coaching/sessions/${id}`
         ),
       complete: (input: CompleteSessionInput) =>
-        request<{ data: CoachingSessionWithTopics }>(
+        request<{ data: CoachingSessionWithTopics & { gamification?: GamificationAction } }>(
           "/coaching/sessions/complete",
           {
             method: "POST",
@@ -118,5 +121,11 @@ export const api = {
       delete: (id: string) =>
         request<void>(`/coaching/sessions/${id}`, { method: "DELETE" }),
     },
+  },
+  gamification: {
+    getStats: () =>
+      request<{ data: GamificationStats }>("/gamification/stats"),
+    getAchievements: () =>
+      request<{ data: Achievement[] }>("/gamification/achievements"),
   },
 };
