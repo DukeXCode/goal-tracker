@@ -768,42 +768,6 @@ All responses are wrapped in a standard envelope:
 
 ---
 
-### XP Awards
-
-When gamification-triggering actions occur, the response includes a `gamification` object with XP details.
-
-| Action | XP Awarded | Trigger
-|--------|------------|----------|
-| Create a goal | 10 XP | `POST /api/goals` |
-| Move goal to in_progress | 10 XP | `PUT /api/goals/:id` (status change from not_started) |
-| Complete a goal | 50 XP | `PUT /api/goals/:id` (status change to completed) |
-| Write a journal entry | 20 XP | `POST /api/journal` |
-| Complete a coaching session | 20 XP | `POST /api/coaching/sessions/complete` |
-
-**Note:** XP is only awarded once per goal per action type (tracked via `xp_awarded` bitmask). Re-completing a goal does not award additional XP.
-
-#### Gamification Response Object
-
-```json
-{
-  "gamification": {
-    "xp_awarded": 50,
-    "total_xp": 400,
-    "new_level": 3,
-    "achievements_unlocked": []
-  }
-}
-```
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `xp_awarded` | `number` | XP earned in this action |
-| `total_xp` | `number` | User's total XP after this action |
-| `new_level` | `number \| null` | New level if leveled up, null otherwise |
-| `achievements_unlocked` | `Achievement[]` | Any achievements unlocked by this action |
-
----
-
 ## Data Schemas
 
 ### Goal
@@ -857,3 +821,27 @@ A coaching session containing discussed topics.
 | `session_date` | `string` | Yes | Session date (ISO 8601) | — |
 | `created_at` | `string` | Yes | Creation timestamp (ISO 8601) | — |
 | `topics` | `CoachingTopic[]` | Yes | Topics discussed in this session | — |
+
+### GamificationStats
+
+User gamification stats with XP, level, and progress.
+
+| Name | Type | Required | Description | Default |
+|------|------|----------|-------------|---------|
+| `user_stats` | `object` | Yes | User stats (id, xp, level, updated_at) | — |
+| `xp_to_next_level` | `number` | Yes | XP needed to reach next level | — |
+| `xp_in_current_level` | `number` | Yes | XP earned in current level | — |
+
+### Achievement
+
+An achievement that can be earned by completing milestones.
+
+| Name | Type | Required | Description | Default |
+|------|------|----------|-------------|---------|
+| `id` | `string` | Yes | UUID identifier | — |
+| `achievement_key` | `string` | Yes | Unique achievement identifier | — |
+| `title` | `string` | Yes | Achievement title | — |
+| `description` | `string` | Yes | Achievement description | — |
+| `icon` | `string` | Yes | Icon identifier | — |
+| `earned_at` | `string \| null` | No | When the achievement was earned (null if locked) | — |
+| `created_at` | `string` | Yes | Creation timestamp (ISO 8601) | — |

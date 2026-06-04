@@ -1074,6 +1074,73 @@
           }
         }
       }
+    },
+    "/api/gamification/stats": {
+      "get": {
+        "operationId": "get_gamification_stats",
+        "summary": "Get Gamification Stats",
+        "description": "Returns the user's current XP, level, and progress toward the next level.",
+        "tags": [
+          "Gamification"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/gamification/achievements": {
+      "get": {
+        "operationId": "get_gamification_achievements",
+        "summary": "Get Achievements",
+        "description": "Returns all achievements, sorted by earned status (earned first, then unearned).",
+        "tags": [
+          "Gamification"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1117,6 +1184,10 @@
             "nullable": true,
             "description": "Target completion date"
           },
+          "xp_awarded": {
+            "type": "string",
+            "description": "Bitmask tracking awarded XP (bit 0 = in_progress, bit 1 = completed)"
+          },
           "created_at": {
             "type": "string",
             "description": "Creation timestamp (ISO 8601)"
@@ -1131,6 +1202,7 @@
           "title",
           "description",
           "status",
+          "xp_awarded",
           "created_at",
           "updated_at"
         ]
@@ -1246,6 +1318,72 @@
           "session_date",
           "created_at",
           "topics"
+        ]
+      },
+      "GamificationStats": {
+        "type": "object",
+        "description": "User gamification stats with XP, level, and progress.",
+        "properties": {
+          "user_stats": {
+            "type": "string",
+            "description": "User stats (id, xp, level, updated_at)"
+          },
+          "xp_to_next_level": {
+            "type": "string",
+            "description": "XP needed to reach next level"
+          },
+          "xp_in_current_level": {
+            "type": "string",
+            "description": "XP earned in current level"
+          }
+        },
+        "required": [
+          "user_stats",
+          "xp_to_next_level",
+          "xp_in_current_level"
+        ]
+      },
+      "Achievement": {
+        "type": "object",
+        "description": "An achievement that can be earned by completing milestones.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID identifier"
+          },
+          "achievement_key": {
+            "type": "string",
+            "description": "Unique achievement identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "Achievement title"
+          },
+          "description": {
+            "type": "string",
+            "description": "Achievement description"
+          },
+          "icon": {
+            "type": "string",
+            "description": "Icon identifier"
+          },
+          "earned_at": {
+            "type": "string",
+            "nullable": true,
+            "description": "When the achievement was earned (null if locked)"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp (ISO 8601)"
+          }
+        },
+        "required": [
+          "id",
+          "achievement_key",
+          "title",
+          "description",
+          "icon",
+          "created_at"
         ]
       }
     }
