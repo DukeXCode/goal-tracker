@@ -96,3 +96,34 @@ export interface ApiListResponse<T> {
 export interface ApiErrorResponse {
   error: string;
 }
+
+// Gamification types
+export interface UserStats {
+  id: string;
+  xp: number;
+  level: number;
+  updated_at: string;
+}
+
+export interface Achievement {
+  id: string;
+  achievement_key: string;
+  title: string;
+  description: string;
+  icon: string;
+  earned_at: string | null;
+  created_at: string;
+}
+
+export interface GamificationStats {
+  user_stats: UserStats;
+  xp_to_next_level: number;
+  xp_in_current_level: number;
+}
+
+export interface GamificationAction {
+  xp_awarded: number;
+  total_xp: number;
+  new_level: number | null;
+  achievements_unlocked: Achievement[];
+}
