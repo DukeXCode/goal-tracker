@@ -116,6 +116,24 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Summary Stats */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 text-center">
+          <p className="text-2xl font-bold text-accent">
+            {goals.filter((g) => g.status === "completed").length}
+          </p>
+          <p className="text-xs text-text-tertiary mt-1">Goals Completed</p>
+        </div>
+        <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 text-center">
+          <p className="text-2xl font-bold text-accent">{entries.length}</p>
+          <p className="text-xs text-text-tertiary mt-1">Journal Entries</p>
+        </div>
+        <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 text-center">
+          <p className="text-2xl font-bold text-accent">{sessions.length}</p>
+          <p className="text-xs text-text-tertiary mt-1">Coaching Sessions</p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Last Journal Entry */}
         <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 md:p-5">
