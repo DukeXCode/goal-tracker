@@ -89,13 +89,18 @@ goalRoutes.put("/:id", async (c) => {
   const target_date = body.target_date !== undefined ? body.target_date : existing.target_date;
   const now = new Date().toISOString();
 
-  // Award XP for status changes
+  // Award XP for status changes (only if not already awarded for this goal)
   let gamificationResult = null;
+  const xpAwarded = existing.xp_awarded ?? 0;
   if (body.status && body.status !== existing.status) {
-    if (body.status === "in_progress" && existing.status === "not_started") {
+    if (body.status === "in_progress" && existing.status === "not_started" && (xpAwarded & 1) === 0) {
       gamificationResult = await awardXp(c.env.DB, 10);
-    } else if (body.status === "completed" && existing.status !== "completed") {
+      // Mark in_progress XP as awarded (bit 0)
+      await c.env.DB.prepare("UPDATE goals SET xp_awarded = xp_awarded | 1 WHERE id = ?").bind(id).run();
+    } else if (body.status === "completed" && existing.status !== "completed" && (xpAwarded & 2) === 0) {
       gamificationResult = await awardXp(c.env.DB, 50);
+      // Mark completed XP as awarded (bit 1)
+      await c.env.DB.prepare("UPDATE goals SET xp_awarded = xp_awarded | 2 WHERE id = ?").bind(id).run();
     }
   }
 

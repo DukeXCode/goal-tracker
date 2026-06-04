@@ -6,6 +6,7 @@ export interface Goal {
   description: string;
   status: GoalStatus;
   target_date: string | null;
+  xp_awarded: number;
   created_at: string;
   updated_at: string;
 }
