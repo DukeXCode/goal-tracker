@@ -19,12 +19,14 @@ export function useJournalEntries(goalId?: string) {
   });
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["journal"] });
+  const invalidateGamification = () => qc.invalidateQueries({ queryKey: ["gamification"] });
 
   const createEntry = async (input: CreateJournalEntryInput) => {
     const res = await api.journal.create(input);
     await invalidate();
     if (res.data.gamification) {
       setXpToast(res.data.gamification.xp_awarded);
+      await invalidateGamification();
     }
     return res.data;
   };

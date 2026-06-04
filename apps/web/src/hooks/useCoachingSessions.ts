@@ -22,12 +22,14 @@ export function useCoachingSessions() {
     qc.invalidateQueries({ queryKey: ["coaching-sessions"] });
     qc.invalidateQueries({ queryKey: ["coaching-topics"] });
   };
+  const invalidateGamification = () => qc.invalidateQueries({ queryKey: ["gamification"] });
 
   const completeSession = async (input: CompleteSessionInput) => {
     const res = await api.coaching.sessions.complete(input);
     await invalidate();
     if (res.data.gamification) {
       setXpToast(res.data.gamification.xp_awarded);
+      await invalidateGamification();
     }
     return res.data;
   };

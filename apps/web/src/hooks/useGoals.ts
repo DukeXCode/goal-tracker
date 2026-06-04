@@ -15,6 +15,7 @@ export function useGoals(statusFilter?: GoalStatus) {
   });
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["goals"] });
+  const invalidateGamification = () => qc.invalidateQueries({ queryKey: ["gamification"] });
 
   const createGoal = async (input: CreateGoalInput) => {
     const res = await api.goals.create(input);
@@ -27,6 +28,7 @@ export function useGoals(statusFilter?: GoalStatus) {
     await invalidate();
     if (res.data.gamification) {
       setXpToast(res.data.gamification.xp_awarded);
+      await invalidateGamification();
     }
     return res.data;
   };
