@@ -60,10 +60,9 @@ export default function GoalDetailPage() {
           <GoalForm
             initialData={goal}
             onSubmit={async (data) => {
-              const res = await api.goals.update(goal.id, data);
-              qc.setQueryData(["goal", id], res.data);
+              await api.goals.update(goal.id, data);
               qc.invalidateQueries({ queryKey: ["goals"] });
-              setEditing(false);
+              navigate("/goals");
             }}
             onCancel={() => setEditing(false)}
           />
