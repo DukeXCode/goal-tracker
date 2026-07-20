@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 import { useGoals } from "../hooks/useGoals";
 import { useJournalEntries } from "../hooks/useJournalEntries";
-import { useCoachingTopics } from "../hooks/useCoachingTopics";
-import { useCoachingSessions } from "../hooks/useCoachingSessions";
 import { useGamification } from "../hooks/useGamification";
 import LevelBadge from "../components/LevelBadge";
 import LevelProgressBar from "../components/LevelProgressBar";
@@ -53,12 +51,10 @@ const statusDots: Record<string, string> = {
 export default function DashboardPage() {
   const { goals, loading: goalsLoading } = useGoals();
   const { entries, loading: entriesLoading } = useJournalEntries();
-  const { topics: pendingTopics, loading: topicsLoading } = useCoachingTopics("pending");
-  const { sessions, loading: sessionsLoading } = useCoachingSessions();
 
   const { stats, statsLoading } = useGamification();
 
-  const loading = goalsLoading || entriesLoading || topicsLoading || sessionsLoading;
+  const loading = goalsLoading || entriesLoading;
 
   if (loading) {
     return (
@@ -78,13 +74,12 @@ export default function DashboardPage() {
     .slice(0, 5);
 
   const lastEntry = entries.length > 0 ? entries[0] : null;
-  const lastSession = sessions.length > 0 ? sessions[0] : null;
 
   return (
     <div className="space-y-6 md:space-y-8">
       <div>
         <h2 className="text-2xl font-bold text-text-primary">Dashboard</h2>
-        <p className="text-sm text-text-tertiary mt-1">Your goals, journal, and coaching at a glance.</p>
+        <p className="text-sm text-text-tertiary mt-1">Your goals and journal at a glance.</p>
       </div>
 
       {/* Gamification Stats */}
@@ -117,7 +112,7 @@ export default function DashboardPage() {
       )}
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 text-center">
           <p className="text-2xl font-bold text-accent">
             {goals.filter((g) => g.status === "completed").length}
@@ -128,68 +123,30 @@ export default function DashboardPage() {
           <p className="text-2xl font-bold text-accent">{entries.length}</p>
           <p className="text-xs text-text-tertiary mt-1">Journal Entries</p>
         </div>
-        <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 text-center">
-          <p className="text-2xl font-bold text-accent">{sessions.length}</p>
-          <p className="text-xs text-text-tertiary mt-1">Coaching Sessions</p>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Last Journal Entry */}
-        <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 md:p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Last Journal</h3>
-            <Link to="/journal" className="text-xs text-accent hover:text-accent-hover transition-colors">View all</Link>
-          </div>
-          {lastEntry ? (
-            <div>
-              <Link to={`/journal/${lastEntry.id}`} className="text-base font-semibold text-text-primary hover:text-accent transition-colors">
-                {lastEntry.title}
-              </Link>
-              <p className="text-2xl font-bold text-accent mt-1">{timeAgo(lastEntry.created_at)}</p>
-              {lastEntry.content && (
-                <p className="text-sm text-text-tertiary mt-2 line-clamp-2">{lastEntry.content.slice(0, 120)}</p>
-              )}
-            </div>
-          ) : (
-            <div className="text-center py-4">
-              <p className="text-sm text-text-tertiary mb-2">No entries yet</p>
-              <Link to="/journal" className="text-sm text-accent hover:text-accent-hover transition-colors">Write your first entry</Link>
-            </div>
-          )}
+      {/* Last Journal Entry */}
+      <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 md:p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Last Journal</h3>
+          <Link to="/journal" className="text-xs text-accent hover:text-accent-hover transition-colors">View all</Link>
         </div>
-
-        {/* Last Coaching Session */}
-        <div className="bg-surface-secondary rounded-xl border border-border-primary p-4 md:p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Last Session</h3>
-            <Link to="/coaching" className="text-xs text-accent hover:text-accent-hover transition-colors">View all</Link>
+        {lastEntry ? (
+          <div>
+            <Link to={`/journal/${lastEntry.id}`} className="text-base font-semibold text-text-primary hover:text-accent transition-colors">
+              {lastEntry.title}
+            </Link>
+            <p className="text-2xl font-bold text-accent mt-1">{timeAgo(lastEntry.created_at)}</p>
+            {lastEntry.content && (
+              <p className="text-sm text-text-tertiary mt-2 line-clamp-2">{lastEntry.content.slice(0, 120)}</p>
+            )}
           </div>
-          {lastSession ? (
-            <div>
-              <p className="text-2xl font-bold text-accent">{formatDate(lastSession.session_date)}</p>
-              <p className="text-sm text-text-tertiary mt-1">{lastSession.topics.length} topic{lastSession.topics.length === 1 ? "" : "s"} discussed</p>
-              <ul className="mt-2 space-y-1">
-                {lastSession.topics.slice(0, 3).map((t) => (
-                  <li key={t.id} className="text-sm text-text-secondary flex items-center gap-2">
-                    <svg className="w-3.5 h-3.5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="truncate">{t.title}</span>
-                  </li>
-                ))}
-                {lastSession.topics.length > 3 && (
-                  <li className="text-xs text-text-tertiary pl-5">+{lastSession.topics.length - 3} more</li>
-                )}
-              </ul>
-            </div>
-          ) : (
-            <div className="text-center py-4">
-              <p className="text-sm text-text-tertiary mb-2">No sessions yet</p>
-              <Link to="/coaching" className="text-sm text-accent hover:text-accent-hover transition-colors">Start coaching</Link>
-            </div>
-          )}
-        </div>
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-sm text-text-tertiary mb-2">No entries yet</p>
+            <Link to="/journal" className="text-sm text-accent hover:text-accent-hover transition-colors">Write your first entry</Link>
+          </div>
+        )}
       </div>
 
       {/* Upcoming Goals */}
@@ -222,42 +179,6 @@ export default function DashboardPage() {
                 </Link>
               );
             })}
-          </div>
-        )}
-      </section>
-
-      {/* Upcoming Coaching Topics */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-text-primary">
-            Coaching Topics
-            {pendingTopics.length > 0 && (
-              <span className="ml-2 text-xs font-medium text-text-tertiary bg-surface-tertiary px-2 py-0.5 rounded-md align-middle">
-                {pendingTopics.length}
-              </span>
-            )}
-          </h3>
-          <Link to="/coaching" className="text-xs text-accent hover:text-accent-hover transition-colors">Manage</Link>
-        </div>
-        {pendingTopics.length === 0 ? (
-          <div className="rounded-xl border border-border-primary bg-surface-secondary p-8 text-center">
-            <p className="text-sm text-text-tertiary">No pending topics for your next session.</p>
-          </div>
-        ) : (
-          <div className="bg-surface-secondary rounded-xl border border-border-primary divide-y divide-border-primary">
-            {pendingTopics.slice(0, 5).map((topic) => (
-              <div key={topic.id} className="px-4 py-3 flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
-                <span className="text-sm text-text-primary">{topic.title}</span>
-              </div>
-            ))}
-            {pendingTopics.length > 5 && (
-              <div className="px-4 py-2.5">
-                <Link to="/coaching" className="text-xs text-text-tertiary hover:text-accent transition-colors">
-                  +{pendingTopics.length - 5} more topics
-                </Link>
-              </div>
-            )}
           </div>
         )}
       </section>
